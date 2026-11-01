@@ -4,12 +4,14 @@ import { FeatureHighlightRow } from '@/components/Home/FeatureHighlightRow';
 import { LowerActionCards } from '@/components/Home/LowerActionCards';
 import { DailyVerseCard } from '@/components/Spiritual/DailyVerseCard';
 import RecentlyPlayed from '@/components/History/RecentlyPlayed';
+import { SEO } from '@/components/Common/SEO';
 import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 
 export default function HomePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10 sm:space-y-12">
+      <SEO />
       {/* 1. Hero Section: Marca, Mensagem, Ouvir Agora, Emblema Dourado com Cruz e Fé • Música • Propósito */}
       <RedesignedHero />
 

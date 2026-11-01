@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://gdmlr.web.app/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>always</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://gdmlr.web.app/images/hero-art-hyperrealistic.jpg</image:loc>
+      <image:title>GDM Live Radio — A rádio cristã que toca sua fé o tempo todo</image:title>
+      <image:caption>Emblema celestial dourado com cruz sagrada e adorador na montanha ao pôr do sol</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://gdmlr.web.app/images/player-album-art.jpg</image:loc>
+      <image:title>GDM Live Radio — Capa Oficial</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://gdmlr.web.app/programacao</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://gdmlr.web.app/sobre</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://gdmlr.web.app/images/card-bible-realistic.jpg</image:loc>
+      <image:title>Bíblia Sagrada Iluminada com Raios Celestiais</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://gdmlr.web.app/comunidade</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://gdmlr.web.app/images/card-headphones-realistic.jpg</image:loc>
+      <image:title>Fones Neon de Estúdio — Pedidos de Louvor</image:title>
+    </image:image>
+  </url>
+</urlset>

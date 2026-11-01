@@ -2,10 +2,15 @@ import { DailyVerseCard } from '@/components/Spiritual/DailyVerseCard';
 import { PrayerWallSection } from '@/components/Community/PrayerWallSection';
 import { TestimoniesSection } from '@/components/Community/TestimoniesSection';
 import { LiveChatSection } from '@/components/Community/LiveChatSection';
+import { SEO } from '@/components/Common/SEO';
 
 export default function CommunityPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <SEO
+        title="Mural de Oração & Comunidade"
+        description="Deixe seu pedido de oração, celebre testemunhos de fé e participe da comunidade de ouvintes da GDM Live Radio."
+      />
       {/* Page Header */}
       <div className="text-center space-y-2">
         <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gdm-purple/20 text-gdm-purple-light border border-gdm-purple/30">

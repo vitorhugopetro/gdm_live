@@ -3,6 +3,7 @@ import { useRadioStore } from '@/store/radioStore';
 import RecentlyPlayed from '@/components/History/RecentlyPlayed';
 import { AlbumArt } from '@/components/NowPlaying/AlbumArt';
 import { SongRequestModal } from '@/components/Community/SongRequestModal';
+import { SEO } from '@/components/Common/SEO';
 import { api } from '@/services/api';
 import type { Track, ApiResponse, PaginatedResponse } from '@/types';
 import {
@@ -66,6 +67,10 @@ export default function ProgramPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <SEO
+        title="Louvores & Programação da Rádio"
+        description="Conheça todo o acervo de 402 louvores originais da GDM Live Radio, peça sua música e acompanhe a programação cristã 24h."
+      />
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>

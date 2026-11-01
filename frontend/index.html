@@ -3,20 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="GDM Live Radio — Música autoral cristã tocando no seu coração" />
-    <meta name="theme-color" content="#7C3AED" />
-    <meta property="og:title" content="GDM Live Radio" />
-    <meta property="og:description" content="Música autoral cristã tocando no seu coração" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://gdmlive.web.app" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- SEO Master Tags -->
+    <title>GDM Live Radio — A rádio cristã que toca sua fé o tempo todo | Graça Digital</title>
+    <meta name="title" content="GDM Live Radio — A rádio cristã que toca sua fé o tempo todo" />
+    <meta name="description" content="Ouça a GDM Live Radio ao vivo 24 horas por dia. Músicas cristãs e louvores autorais da Graça Digital (GDM), mensagens de fé, adoração e renovação espiritual." />
+    <meta name="keywords" content="rádio cristã, gdm live radio, graça digital, rádio gospel ao vivo, louvores autorais, louvor cristão, musica gospel 24 horas, oração, adoração, gdmlr" />
+    <meta name="author" content="Graça Digital (GDM)" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#7000FF" />
+    <link rel="canonical" href="https://gdmlr.web.app/" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="music.radio_station" />
+    <meta property="og:site_name" content="GDM Live Radio" />
+    <meta property="og:url" content="https://gdmlr.web.app/" />
+    <meta property="og:title" content="GDM Live Radio — A rádio cristã que toca sua fé o tempo todo!" />
+    <meta property="og:description" content="Músicas autorais da Graça Digital (GDM), criadas com fé, criatividade e propósito para levar esperança e renovação até o seu coração." />
+    <meta property="og:image" content="https://gdmlr.web.app/images/hero-art-hyperrealistic.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GDM Live Radio - Emblema Dourado 3D, Adorador na Montanha e Cruz Radiante" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://gdmlr.web.app/" />
+    <meta name="twitter:title" content="GDM Live Radio — A rádio cristã que toca sua fé o tempo todo" />
+    <meta name="twitter:description" content="Músicas autorais da Graça Digital (GDM). Transmissão contínua 24h de louvor e esperança." />
+    <meta name="twitter:image" content="https://gdmlr.web.app/images/hero-art-hyperrealistic.jpg" />
+    <meta name="twitter:creator" content="@gracadigital" />
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/jpeg" href="/images/player-album-art.jpg" />
+    <link rel="apple-touch-icon" href="/images/player-album-art.jpg" />
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>GDM Live Radio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet" />
+
+    <!-- Schema.org JSON-LD Structured Data for Google Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "RadioStation",
+          "@id": "https://gdmlr.web.app/#radiostation",
+          "name": "GDM Live Radio",
+          "alternateName": "Graça Digital Live Radio",
+          "url": "https://gdmlr.web.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://gdmlr.web.app/images/player-album-art.jpg",
+            "width": 512,
+            "height": 512
+          },
+          "image": "https://gdmlr.web.app/images/hero-art-hyperrealistic.jpg",
+          "description": "A rádio cristã que toca sua fé o tempo todo! Músicas autorais da Graça Digital (GDM), criadas com fé, criatividade e propósito.",
+          "genre": "Christian Praise and Worship",
+          "inLanguage": "pt-BR",
+          "broadcastDisplayName": "GDM Live Radio 24h",
+          "areaServed": "Global",
+          "action": {
+            "@type": "ListenAction",
+            "target": [
+              {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://gdmlr.web.app/",
+                "actionPlatform": [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform",
+                  "http://schema.org/AndroidPlatform",
+                  "http://schema.org/IOSPlatform"
+                ]
+              }
+            ],
+            "expectsAcceptanceOf": {
+              "@type": "Offer",
+              "category": "free",
+              "price": "0",
+              "priceCurrency": "BRL"
+            }
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://gdmlr.web.app/#website",
+          "url": "https://gdmlr.web.app/",
+          "name": "GDM Live Radio",
+          "description": "Músicas autorais da Graça Digital (GDM), criadas com fé e propósito.",
+          "publisher": {
+            "@id": "https://gdmlr.web.app/#radiostation"
+          },
+          "inLanguage": "pt-BR"
+        }
+      ]
+    }
+    </script>
   </head>
-  <body>
+  <body class="bg-[#07070D] text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
