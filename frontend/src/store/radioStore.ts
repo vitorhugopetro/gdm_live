@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { NowPlaying, PlaybackHistory, Track, ConnectionState, BroadcastBanner } from '@/types';
+import { GDM_WEB_PLAYLIST } from '@/config/webPlaylist';
 
 interface RadioState {
   // Data
@@ -9,6 +10,7 @@ interface RadioState {
   upcomingTracks: Track[];
   banner: BroadcastBanner | null;
   favorites: string[]; // Track IDs
+  currentPlaylistIndex: number;
 
   // Player state
   isPlayerPlaying: boolean;
@@ -38,6 +40,7 @@ interface RadioState {
   setStreamUrl: (url: string) => void;
   setReconnectAttempt: (attempt: number) => void;
   setSleepTimer: (minutes: number | null) => void;
+  setCurrentPlaylistIndex: (index: number) => void;
   reset: () => void;
 }
 
@@ -46,7 +49,6 @@ function resolveDefaultStreamUrl(): string {
   const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
 
   if (isHttps) {
-    // If the stream is https, use it; otherwise avoid Mixed Content by using relative /stream
     if (envUrl && envUrl.startsWith('https://')) {
       return envUrl;
     }
@@ -57,7 +59,6 @@ function resolveDefaultStreamUrl(): string {
 }
 
 const DEFAULT_STREAM_URL = resolveDefaultStreamUrl();
-
 const LOCAL_STORAGE_FAVORITES_KEY = 'gdm_live_favorites';
 
 function loadInitialFavorites(): string[] {
@@ -69,13 +70,44 @@ function loadInitialFavorites(): string[] {
   }
 }
 
+function getInitialNowPlaying(): NowPlaying {
+  const first = GDM_WEB_PLAYLIST[0] || {
+    id: '01-a-cruz-e-o-sacrificio.mp3',
+    title: 'A Cruz e o Sacrifício de Jesus',
+    artist: 'Graça Digital (GDM)',
+    album: 'Louvores de Fé & Esperança',
+    url: '/audio/01-a-cruz-e-o-sacrificio.mp3',
+    coverUrl: '/images/player-album-art.jpg'
+  };
+
+  return {
+    track: {
+      id: first.id,
+      title: first.title,
+      artist: first.artist,
+      album: first.album,
+      duration: 320,
+      coverArt: first.coverUrl,
+      coverArtDataUrl: first.coverUrl,
+      fileName: first.id,
+      fileSize: 5482486,
+      format: 'mp3',
+    },
+    startedAt: new Date().toISOString(),
+    elapsed: 0,
+    listenerCount: 142,
+    streamUrl: first.url,
+  };
+}
+
 export const useRadioStore = create<RadioState>()(
   subscribeWithSelector((set, get) => ({
-    nowPlaying: null,
+    nowPlaying: getInitialNowPlaying(),
     history: [],
     upcomingTracks: [],
     banner: null,
     favorites: loadInitialFavorites(),
+    currentPlaylistIndex: 0,
 
     isPlayerPlaying: false,
     playerVolume: 0.8,
@@ -89,6 +121,7 @@ export const useRadioStore = create<RadioState>()(
     setHistory: (history) => set({ history }),
     setUpcomingTracks: (upcomingTracks) => set({ upcomingTracks }),
     setBanner: (banner) => set({ banner }),
+    setCurrentPlaylistIndex: (currentPlaylistIndex) => set({ currentPlaylistIndex }),
 
     toggleFavorite: (trackId: string) => {
       const current = get().favorites;
@@ -142,13 +175,14 @@ export const useRadioStore = create<RadioState>()(
 
     reset: () =>
       set({
-        nowPlaying: null,
+        nowPlaying: getInitialNowPlaying(),
         history: [],
         upcomingTracks: [],
         isPlayerPlaying: false,
         connectionState: 'idle',
         reconnectAttempt: 0,
         sleepTimerEndsAt: null,
+        currentPlaylistIndex: 0,
       }),
   })),
 );

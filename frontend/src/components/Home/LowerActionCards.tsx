@@ -51,32 +51,39 @@ export function LowerActionCards() {
           </div>
         </div>
 
-        {/* CARD 2: Sobre a GDM */}
+        {/* CARD 2: Sobre a GDM (Com Bíblia Sagrada Iluminada Hiper-Realista) */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E1020] to-[#07070D] border border-[#1C223A] hover:border-[#FFC928]/50 p-6 shadow-xl flex flex-col justify-between group transition-all duration-300">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#FFC928]" />
-              <h3 className="font-extrabold text-white text-base">
-                Sobre a GDM
-              </h3>
+          <div className="grid grid-cols-12 gap-3 items-start">
+            <div className="col-span-8 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-[#FFC928]" />
+                <h3 className="font-extrabold text-white text-base">
+                  Sobre a GDM
+                </h3>
+              </div>
+
+              <p className="text-xs sm:text-xs text-[#C9C9D4] leading-relaxed line-clamp-4">
+                A <strong>Graça Digital (GDM)</strong> é uma produção musical independente, criada com fé, criatividade e propósito. Nossa rádio transmite exclusivamente músicas autorais para levar esperança e renovação.
+              </p>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#C9C9D4] leading-relaxed line-clamp-4">
-              A <strong>Graça Digital (GDM)</strong> é uma produção musical independente, criada com fé, criatividade e propósito. Nossa rádio transmite exclusivamente músicas autorais para levar esperança e renovação.
-            </p>
+            {/* Imagem Hiper-Realista da Bíblia Aberta com Raios de Ouro */}
+            <div className="col-span-4 flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden border border-[#FFC928]/40 shadow-[0_0_20px_rgba(255,201,40,0.4)] group-hover:scale-105 transition-transform duration-300">
+                <img
+                  src="/images/card-bible-realistic.jpg"
+                  alt="Bíblia Sagrada Aberta com Luz Celestial"
+                  className="w-full h-24 object-cover"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Composição Ilustrada da Bíblia Sagrada Iluminada + Botão */}
+          {/* Botão de Ação */}
           <div className="mt-5 pt-4 border-t border-[#1C223A] flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {/* Ícone Estilizado da Bíblia Aberta com Luz Dourada */}
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2A1F05] to-[#4A3705] border border-[#FFC928]/40 flex items-center justify-center shadow-[0_0_16px_rgba(255,201,40,0.3)]">
-                <span className="text-xl">📖</span>
-              </div>
-              <span className="text-[11px] text-[#FFE58F] font-bold tracking-wide">
-                Palavra & Fé
-              </span>
-            </div>
+            <span className="text-[11px] text-[#FFE58F] font-bold tracking-wide">
+              Palavra & Fé
+            </span>
 
             <Link
               to="/sobre"
@@ -88,35 +95,43 @@ export function LowerActionCards() {
           </div>
         </div>
 
-        {/* CARD 3: Faça Seu Pedido */}
+        {/* CARD 3: Faça Seu Pedido (Com Fone de Ouvido Neon Studio Hiper-Realista) */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E1020] to-[#120B24] border border-[#1C223A] hover:border-[#7000FF]/50 p-6 shadow-xl flex flex-col justify-between group transition-all duration-300">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Music2 className="w-5 h-5 text-[#FFC928]" />
-              <h3 className="font-extrabold text-white text-base">
-                Faça Seu Pedido
-              </h3>
+          <div className="grid grid-cols-12 gap-3 items-start">
+            <div className="col-span-8 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <Music2 className="w-5 h-5 text-[#FFC928]" />
+                <h3 className="font-extrabold text-white text-base">
+                  Faça Seu Pedido
+                </h3>
+              </div>
+
+              <p className="text-xs sm:text-xs text-[#C9C9D4] leading-relaxed">
+                Peça sua música favorita e compartilhe conosco sua mensagem de carinho e edificação!
+              </p>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#C9C9D4] leading-relaxed">
-              Peça sua música favorita e compartilhe conosco sua mensagem de carinho e edificação!
-            </p>
+            {/* Imagem Hiper-Realista do Fone de Ouvido Neon Purple */}
+            <div className="col-span-4 flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden border border-[#7000FF]/40 shadow-[0_0_20px_rgba(112,0,255,0.4)] group-hover:scale-105 transition-transform duration-300">
+                <img
+                  src="/images/card-headphones-realistic.jpg"
+                  alt="Fones de Ouvido Studio Neon Violeta"
+                  className="w-full h-24 object-cover"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Fones de Ouvido Studio Neon + Botão Pedir Música */}
+          {/* Botão Pedir Música */}
           <div className="mt-5 pt-4 border-t border-[#1C223A] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-[#1C1635] border border-[#7000FF]/50 flex items-center justify-center shadow-[0_0_16px_rgba(112,0,255,0.4)]">
-                <span className="text-xl">🎧</span>
-              </div>
-              <span className="text-[11px] text-[#9B4DFF] font-bold">
-                No Ar
-              </span>
-            </div>
+            <span className="text-[11px] text-[#9B4DFF] font-bold">
+              No Ar 24h
+            </span>
 
             <button
               onClick={() => setIsRequestModalOpen(true)}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#7000FF] hover:bg-[#851EFF] text-white text-xs font-bold shadow-[0_0_20px_rgba(112,0,255,0.6)] transition-all duration-200 hover:scale-105"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#7000FF] hover:bg-[#851EFF] text-white text-xs font-bold shadow-[0_0_20px_rgba(112,0,255,0.6)] transition-all duration-200 hover:scale-105 cursor-pointer"
             >
               <span>Pedir Música</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -132,4 +147,3 @@ export function LowerActionCards() {
     </>
   );
 }
-

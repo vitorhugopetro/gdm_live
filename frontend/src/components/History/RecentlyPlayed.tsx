@@ -1,6 +1,7 @@
 import { useRadioStore } from '@/store/radioStore';
 import { AlbumArt } from '@/components/NowPlaying/AlbumArt';
 import { Clock } from 'lucide-react';
+import { GDM_WEB_PLAYLIST } from '@/config/webPlaylist';
 
 interface Props {
   limit?: number;
@@ -16,38 +17,56 @@ function formatTime(iso: string): string {
 
 export default function RecentlyPlayed({ limit = 10 }: Props) {
   const { history } = useRadioStore();
-  const displayHistory = history.slice(0, limit);
 
-  if (displayHistory.length === 0) {
-    return (
-      <div className="bg-gdm-card border border-gdm-border rounded-2xl p-8 text-center">
-        <Clock className="w-8 h-8 text-gdm-muted mx-auto mb-3 opacity-50" />
-        <p className="text-gdm-muted text-sm">
-          Nenhuma música tocada ainda. Aguardando a transmissão iniciar.
-        </p>
-      </div>
-    );
-  }
+  const fallbackHistory = GDM_WEB_PLAYLIST.slice(1, 6).map((t, idx) => ({
+    id: t.id,
+    track: {
+      id: t.id,
+      title: t.title,
+      artist: t.artist,
+      album: t.album,
+      duration: 280,
+      coverArt: t.coverUrl,
+      coverArtDataUrl: t.coverUrl,
+      filename: t.id,
+      fileSize: 5000000,
+      bitrate: 128,
+      format: 'mp3',
+      playCount: 1,
+      lastPlayed: new Date(Date.now() - (idx + 1) * 320000).toISOString(),
+      addedAt: new Date().toISOString(),
+      path: t.url,
+    },
+    playedAt: new Date(Date.now() - (idx + 1) * 320000).toISOString(),
+    listenersCount: 120 - idx * 5,
+  }));
+
+  const items = history.length > 0 ? history.slice(0, limit) : fallbackHistory.slice(0, limit);
 
   return (
-    <ul className="space-y-2" aria-label="Músicas tocadas recentemente">
-      {displayHistory.map((item) => (
+    <ul className="space-y-2.5" aria-label="Músicas tocadas recentemente">
+      {items.map((item) => (
         <li
           key={item.id}
-          className="bg-gdm-card border border-gdm-border rounded-xl px-3 py-2.5 flex items-center gap-3 hover:bg-white/2 transition-colors"
+          className="bg-gradient-to-r from-[#0E1020] to-[#07070D] border border-[#1C223A] hover:border-[#7000FF]/40 rounded-xl px-3.5 py-2.5 flex items-center gap-3.5 hover:bg-[#120B24] transition-all group"
         >
-          <AlbumArt src={item.track.coverArt} alt={item.track.title} size="sm" />
-          <div className="flex-1 min-w-0">
-            <p className="text-gdm-text text-sm font-medium truncate">{item.track.title}</p>
-            <p className="text-gdm-muted text-xs truncate">{item.track.artist}</p>
+          <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-[#2E3654]">
+            <img
+              src={item.track.coverArt || '/images/player-album-art.jpg'}
+              alt={item.track.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            />
           </div>
-          <time
-            className="text-gdm-muted text-xs tabular-nums flex-shrink-0"
-            dateTime={item.playedAt}
-            title={new Date(item.playedAt).toLocaleString('pt-BR')}
-          >
-            {formatTime(item.playedAt)}
-          </time>
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-sm font-bold truncate group-hover:text-[#FFC928] transition-colors">
+              {item.track.title}
+            </p>
+            <p className="text-[#C9C9D4] text-xs truncate">{item.track.artist}</p>
+          </div>
+          <div className="flex items-center gap-1.5 text-[#7A839E] text-xs tabular-nums flex-shrink-0">
+            <Clock className="w-3.5 h-3.5 text-[#FFC928]" />
+            <time dateTime={item.playedAt}>{formatTime(item.playedAt)}</time>
+          </div>
         </li>
       ))}
     </ul>

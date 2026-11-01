@@ -27,10 +27,10 @@ export function RedesignedMasterPlayer() {
     toggleMute,
   } = useRadioStore();
 
-  const { retry } = useRadioStream();
+  const { retry, nextTrack, prevTrack, shuffleTrack } = useRadioStream();
 
   const track = nowPlaying?.track;
-  const isLoading = connectionState === 'connecting' || connectionState === 'loading';
+  const isLoading = connectionState === 'loading' || connectionState === 'connecting';
   const isReconnecting = connectionState === 'reconnecting';
   const isError = connectionState === 'offline' || connectionState === 'error';
   const isLive = connectionState === 'playing';
@@ -53,28 +53,15 @@ export function RedesignedMasterPlayer() {
         <div className="flex items-center gap-4 min-w-0 w-full md:w-auto flex-1">
           {/* Capa com Emblema Dourado da GDM */}
           <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-[#1C1133] to-[#0B0B16] border border-[#7000FF]/40 flex-shrink-0 flex items-center justify-center shadow-lg overflow-hidden group">
-            {track?.coverArt || track?.coverArtDataUrl ? (
-              <img
-                src={track.coverArt || track.coverArtDataUrl}
-                alt={track.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-10 h-10 flex items-center justify-center drop-shadow-[0_0_10px_rgba(255,201,40,0.6)]">
-                <svg viewBox="0 0 100 80" className="w-full h-full fill-none">
-                  <path
-                    d="M32 14 C32 10, 37 7.5, 41 9.8 L86 36.8 C90 39.2, 90 44.8, 86 47.2 L41 74.2 C37 76.5, 32 74, 32 70 Z"
-                    fill="#FFC928"
-                  />
-                  <rect x="49" y="24" width="4.5" height="34" rx="2" fill="#FFFFFF" />
-                  <rect x="41" y="33" width="20.5" height="4.5" rx="2" fill="#FFFFFF" />
-                </svg>
-              </div>
-            )}
+            <img
+              src={track?.coverArt || track?.coverArtDataUrl || '/images/player-album-art.jpg'}
+              alt={track ? track.title : 'Graça Digital'}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
 
-            {/* Efeito de rotação quando ao vivo */}
+            {/* Efeito de brilho quando tocando */}
             {isLive && isPlayerPlaying && (
-              <div className="absolute inset-0 bg-[#7000FF]/10 pointer-events-none animate-pulse" />
+              <div className="absolute inset-0 bg-[#7000FF]/15 pointer-events-none animate-pulse" />
             )}
           </div>
 
@@ -84,7 +71,7 @@ export function RedesignedMasterPlayer() {
               Agora Tocando:
             </span>
             <h2 className="text-base sm:text-lg font-extrabold text-white truncate leading-tight mt-0.5">
-              {track ? track.title : 'GDM Live Radio'}
+              {track ? track.title : 'Esperança Viva'}
             </h2>
             <p className="text-xs sm:text-sm text-[#C9C9D4] truncate font-medium">
               {track ? track.artist : 'Graça Digital (GDM)'}
@@ -97,18 +84,19 @@ export function RedesignedMasterPlayer() {
           {/* Botão Aleatório / Program Mode */}
           <button
             type="button"
-            className="p-2 text-[#7A839E] hover:text-[#C9C9D4] transition-colors rounded-full hover:bg-white/5"
-            title="Modo Programação Aleatória Contínua"
+            onClick={shuffleTrack}
+            className="p-2 text-[#7A839E] hover:text-[#FFC928] transition-colors rounded-full hover:bg-white/5 active:scale-95"
+            title="Tocar louvor aleatório"
           >
-            <Shuffle className="w-4 h-4 text-[#7000FF]" />
+            <Shuffle className="w-4 h-4 text-[#7000FF] hover:text-[#FFC928]" />
           </button>
 
           {/* Botão Anterior */}
           <button
             type="button"
-            onClick={retry}
-            className="p-2 text-[#C9C9D4] hover:text-white transition-colors rounded-full hover:bg-white/5"
-            title="Reiniciar buffer da transmissão"
+            onClick={prevTrack}
+            className="p-2 text-[#C9C9D4] hover:text-[#FFC928] transition-colors rounded-full hover:bg-white/5 active:scale-95"
+            title="Louvor anterior"
           >
             <SkipBack className="w-5 h-5 fill-current" />
           </button>
@@ -134,9 +122,9 @@ export function RedesignedMasterPlayer() {
           {/* Botão Próximo */}
           <button
             type="button"
-            onClick={retry}
-            className="p-2 text-[#C9C9D4] hover:text-white transition-colors rounded-full hover:bg-white/5"
-            title="Sincronizar com transmissão ao vivo"
+            onClick={nextTrack}
+            className="p-2 text-[#C9C9D4] hover:text-[#FFC928] transition-colors rounded-full hover:bg-white/5 active:scale-95"
+            title="Próximo louvor"
           >
             <SkipForward className="w-5 h-5 fill-current" />
           </button>
@@ -144,10 +132,11 @@ export function RedesignedMasterPlayer() {
           {/* Botão Loop / Contínuo */}
           <button
             type="button"
-            className="p-2 text-[#7A839E] hover:text-[#C9C9D4] transition-colors rounded-full hover:bg-white/5"
-            title="Transmissão 24h sem interrupção"
+            onClick={nextTrack}
+            className="p-2 text-[#7A839E] hover:text-[#FFC928] transition-colors rounded-full hover:bg-white/5 active:scale-95"
+            title="Transmissão contínua 24h"
           >
-            <Repeat className="w-4 h-4 text-[#7000FF]" />
+            <Repeat className="w-4 h-4 text-[#7000FF] hover:text-[#FFC928]" />
           </button>
         </div>
 
@@ -158,39 +147,35 @@ export function RedesignedMasterPlayer() {
             <button
               onClick={toggleMute}
               aria-label={playerMuted ? 'Ativar som' : 'Silenciar'}
-              className="p-2 text-[#C9C9D4] hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              className="p-2 text-[#C9C9D4] hover:text-[#FFC928] transition-colors rounded-full hover:bg-white/5"
             >
-              {playerMuted ? (
-                <VolumeX className="w-5 h-5 text-rose-400" />
+              {playerMuted || playerVolume === 0 ? (
+                <VolumeX className="w-5 h-5 text-red-400" />
               ) : (
-                <Volume2 className="w-5 h-5" />
+                <Volume2 className="w-5 h-5 text-[#9B4DFF]" />
               )}
             </button>
 
-            {/* Slider de Volume Roxo */}
-            <div className="w-20 sm:w-28 flex items-center">
+            <div className="relative w-20 sm:w-24 flex items-center">
               <input
                 type="range"
-                min={0}
-                max={1}
-                step={0.01}
+                min="0"
+                max="1"
+                step="0.01"
                 value={playerMuted ? 0 : playerVolume}
                 onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  setVolume(val);
-                  if (val > 0 && playerMuted) {
-                    useRadioStore.getState().setMuted(false);
-                  }
+                  setVolume(parseFloat(e.target.value));
                 }}
-                className="w-full accent-[#7000FF] cursor-pointer h-1.5 bg-[#1C223A] rounded-lg"
+                className="w-full h-1.5 bg-[#1C223A] rounded-lg appearance-none cursor-pointer accent-[#7000FF] hover:accent-[#9B4DFF]"
+                aria-label="Volume do áudio"
               />
             </div>
           </div>
 
-          {/* Botão "Ver Programação" */}
+          {/* Botão Ver Programação */}
           <Link
             to="/programacao"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#1C223A]/80 hover:bg-[#7000FF]/30 hover:border-[#7000FF] text-white text-xs font-bold border border-[#1C223A] shadow-md transition-all duration-200 hover:scale-105 flex-shrink-0"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1C223A] hover:bg-[#7000FF] hover:text-white text-[#C9C9D4] text-xs font-bold transition-all duration-200 border border-[#2E3654] hover:border-[#7000FF]"
           >
             <ListMusic className="w-4 h-4 text-[#FFC928]" />
             <span>Ver Programação</span>
@@ -200,4 +185,3 @@ export function RedesignedMasterPlayer() {
     </div>
   );
 }
-

@@ -1,23 +1,52 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRadioStore } from '@/store/radioStore';
+import { GDM_WEB_PLAYLIST } from '@/config/webPlaylist';
+import type { NowPlaying } from '@/types';
 
-const MAX_RETRIES = 5;
-const BASE_BACKOFF_MS = 2000;
+// Global singleton audio element so playback is continuous across all routes & components
+let globalAudio: HTMLAudioElement | null = null;
+
+export function getGlobalAudio(): HTMLAudioElement | null {
+  if (typeof window === 'undefined') return null;
+  if (!globalAudio) {
+    globalAudio = new Audio();
+    globalAudio.preload = 'auto';
+  }
+  return globalAudio;
+}
+
+function createTrackMetadata(track: typeof GDM_WEB_PLAYLIST[0]): NowPlaying {
+  return {
+    track: {
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      duration: 300,
+      coverArt: track.coverUrl,
+      coverArtDataUrl: track.coverUrl,
+      fileName: track.id,
+      fileSize: 5000000,
+      format: 'mp3',
+    },
+    startedAt: new Date().toISOString(),
+    elapsed: 0,
+    listenerCount: 142,
+    streamUrl: track.url,
+  };
+}
 
 export function useRadioStream() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const retryCountRef = useRef(0);
-
   const {
     isPlayerPlaying,
     playerVolume,
     playerMuted,
-    streamUrl,
     connectionState,
+    currentPlaylistIndex,
     setConnectionState,
     setIsPlaying,
-    setReconnectAttempt,
+    setNowPlaying,
+    setCurrentPlaylistIndex,
     sleepTimerEndsAt,
     setSleepTimer,
   } = useRadioStore();
@@ -36,145 +65,191 @@ export function useRadioStream() {
     return () => clearInterval(timer);
   }, [sleepTimerEndsAt, setIsPlaying, setSleepTimer]);
 
-  // Create audio element once
+  // Sync volume / mute with global audio singleton
   useEffect(() => {
-    const audio = new Audio();
-    audio.preload = 'none';
-    audioRef.current = audio;
-
-    return () => {
-      audio.pause();
-      audio.src = '';
-      audioRef.current = null;
-    };
-  }, []);
-
-  // Sync volume / mute
-  useEffect(() => {
-    const audio = audioRef.current;
+    const audio = getGlobalAudio();
     if (!audio) return;
     audio.volume = playerMuted ? 0 : playerVolume;
   }, [playerVolume, playerMuted]);
 
-  const stopAndClear = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    audio.src = '';
-    if (retryTimerRef.current) {
-      clearTimeout(retryTimerRef.current);
-      retryTimerRef.current = null;
-    }
-    retryCountRef.current = 0;
-    setReconnectAttempt(0);
-  }, [setReconnectAttempt]);
+  // Play specific track index
+  const playTrackIndex = useCallback(
+    (index: number) => {
+      const audio = getGlobalAudio();
+      if (!audio) return;
 
-  const connectStream = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+      const validIndex = (index + GDM_WEB_PLAYLIST.length) % GDM_WEB_PLAYLIST.length;
+      const track = GDM_WEB_PLAYLIST[validIndex];
+      if (!track) return;
 
-    // For live radio: re-set src to force reload from live edge
-    const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
-    let targetUrl = streamUrl;
-    if (isHttps && targetUrl.startsWith('http://')) {
-      if (targetUrl.startsWith('http://localhost') || targetUrl.startsWith('http://127.0.0.1')) {
-        targetUrl = '/stream';
-      } else {
-        targetUrl = targetUrl.replace('http://', 'https://');
+      setCurrentPlaylistIndex(validIndex);
+      setNowPlaying(createTrackMetadata(track));
+
+      const isSameSrc = audio.src && audio.src.endsWith(track.url);
+      if (!isSameSrc) {
+        audio.src = track.url;
       }
-    }
-
-    audio.src = '';
-    audio.src = targetUrl;
-    audio.volume = playerMuted ? 0 : playerVolume;
-    audio.load();
-
-    setConnectionState('connecting');
-
-    const onCanPlay = () => {
+      audio.volume = playerMuted ? 0 : playerVolume;
       setConnectionState('loading');
-      audio.play().catch(() => {
-        setConnectionState('error');
-        setIsPlaying(false);
-      });
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setConnectionState('playing');
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.warn('[Audio Engine] Playback promise error:', err);
+            // In case autoplay is restricted before user gesture
+            setConnectionState('paused');
+            setIsPlaying(false);
+          });
+      }
+    },
+    [
+      playerMuted,
+      playerVolume,
+      setConnectionState,
+      setCurrentPlaylistIndex,
+      setIsPlaying,
+      setNowPlaying,
+    ],
+  );
+
+  // Next Track
+  const nextTrack = useCallback(() => {
+    const nextIdx = (currentPlaylistIndex + 1) % GDM_WEB_PLAYLIST.length;
+    playTrackIndex(nextIdx);
+  }, [currentPlaylistIndex, playTrackIndex]);
+
+  // Previous Track
+  const prevTrack = useCallback(() => {
+    const audio = getGlobalAudio();
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+      return;
+    }
+    const prevIdx = (currentPlaylistIndex - 1 + GDM_WEB_PLAYLIST.length) % GDM_WEB_PLAYLIST.length;
+    playTrackIndex(prevIdx);
+  }, [currentPlaylistIndex, playTrackIndex]);
+
+  // Shuffle Track
+  const shuffleTrack = useCallback(() => {
+    if (GDM_WEB_PLAYLIST.length <= 1) {
+      playTrackIndex(0);
+      return;
+    }
+    let randIdx = currentPlaylistIndex;
+    while (randIdx === currentPlaylistIndex) {
+      randIdx = Math.floor(Math.random() * GDM_WEB_PLAYLIST.length);
+    }
+    playTrackIndex(randIdx);
+  }, [currentPlaylistIndex, playTrackIndex]);
+
+  // Audio Event Listeners (Ended, Error, Playing, Waiting)
+  useEffect(() => {
+    const audio = getGlobalAudio();
+    if (!audio) return;
+
+    const onEnded = () => {
+      // Loop to next track continuously
+      const nextIdx = (useRadioStore.getState().currentPlaylistIndex + 1) % GDM_WEB_PLAYLIST.length;
+      playTrackIndex(nextIdx);
+    };
+
+    const onError = () => {
+      // On error, skip to next track
+      const nextIdx = (useRadioStore.getState().currentPlaylistIndex + 1) % GDM_WEB_PLAYLIST.length;
+      playTrackIndex(nextIdx);
     };
 
     const onPlaying = () => {
       setConnectionState('playing');
-      retryCountRef.current = 0;
-      setReconnectAttempt(0);
     };
 
     const onWaiting = () => {
-      if (connectionState !== 'reconnecting') {
+      if (useRadioStore.getState().connectionState !== 'loading') {
         setConnectionState('loading');
       }
     };
 
-    const onError = () => {
-      const attempt = retryCountRef.current;
-
-      if (attempt >= MAX_RETRIES) {
-        setConnectionState('offline');
-        setIsPlaying(false);
-        stopAndClear();
-        return;
-      }
-
-      retryCountRef.current = attempt + 1;
-      setReconnectAttempt(attempt + 1);
-      setConnectionState('reconnecting');
-
-      const delay = BASE_BACKOFF_MS * Math.pow(2, attempt);
-      retryTimerRef.current = setTimeout(() => {
-        connectStream();
-      }, delay);
-    };
-
-    const onEnded = () => {
-      // Live streams shouldn't "end" — treat as error
-      onError();
-    };
-
-    // Attach listeners (remove old ones first)
-    audio.removeEventListener('canplay', onCanPlay);
-    audio.removeEventListener('playing', onPlaying);
-    audio.removeEventListener('waiting', onWaiting);
-    audio.removeEventListener('error', onError);
-    audio.removeEventListener('ended', onEnded);
-
-    audio.addEventListener('canplay', onCanPlay, { once: true });
+    audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('waiting', onWaiting);
-    audio.addEventListener('error', onError);
-    audio.addEventListener('ended', onEnded);
-  }, [
-    streamUrl,
-    playerVolume,
-    playerMuted,
-    connectionState,
-    setConnectionState,
-    setIsPlaying,
-    setReconnectAttempt,
-    stopAndClear,
-  ]);
 
-  // React to play/pause intent
+    return () => {
+      audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
+      audio.removeEventListener('playing', onPlaying);
+      audio.removeEventListener('waiting', onWaiting);
+    };
+  }, [playTrackIndex, setConnectionState]);
+
+  // React to isPlayerPlaying state changes
   useEffect(() => {
+    const audio = getGlobalAudio();
+    if (!audio) return;
+
     if (isPlayerPlaying) {
-      connectStream();
+      if (!audio.src || audio.src === '' || audio.src.endsWith('/stream')) {
+        playTrackIndex(currentPlaylistIndex);
+      } else {
+        setConnectionState('loading');
+        audio
+          .play()
+          .then(() => {
+            setConnectionState('playing');
+          })
+          .catch(() => {
+            playTrackIndex(currentPlaylistIndex);
+          });
+      }
     } else {
-      stopAndClear();
+      audio.pause();
       setConnectionState('paused');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlayerPlaying]);
+  }, [isPlayerPlaying]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // System Media Session API
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
+
+    const currentTrack = GDM_WEB_PLAYLIST[currentPlaylistIndex];
+    if (currentTrack) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        album: currentTrack.album,
+        artwork: [
+          { src: '/images/player-album-art.jpg', sizes: '96x96', type: 'image/jpeg' },
+          { src: '/images/player-album-art.jpg', sizes: '256x256', type: 'image/jpeg' },
+        ],
+      });
+    }
+
+    navigator.mediaSession.setActionHandler('play', () => setIsPlaying(true));
+    navigator.mediaSession.setActionHandler('pause', () => setIsPlaying(false));
+    navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+    navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+
+    return () => {
+      try {
+        navigator.mediaSession.setActionHandler('play', null);
+        navigator.mediaSession.setActionHandler('pause', null);
+        navigator.mediaSession.setActionHandler('previoustrack', null);
+        navigator.mediaSession.setActionHandler('nexttrack', null);
+      } catch {
+        // ignore
+      }
+    };
+  }, [currentPlaylistIndex, nextTrack, prevTrack, setIsPlaying]);
 
   const retry = useCallback(() => {
-    retryCountRef.current = 0;
-    setReconnectAttempt(0);
-    setIsPlaying(true);
-  }, [setReconnectAttempt, setIsPlaying]);
+    playTrackIndex(currentPlaylistIndex);
+  }, [currentPlaylistIndex, playTrackIndex]);
 
-  return { retry };
+  return { retry, nextTrack, prevTrack, shuffleTrack, playTrackIndex };
 }

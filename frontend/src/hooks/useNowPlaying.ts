@@ -3,7 +3,7 @@ import { api } from '@/services/api';
 import { useRadioStore } from '@/store/radioStore';
 import type { NowPlaying, PlaybackHistory, BroadcastBanner } from '@/types';
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 15_000;
 
 export function useNowPlaying() {
   const { setNowPlaying, setHistory, setBanner } = useRadioStore();
@@ -17,41 +17,46 @@ export function useNowPlaying() {
         api.get<{ data: BroadcastBanner }>('/api/banner'),
       ]);
 
-      if (nowRes.status === 'fulfilled') {
+      if (nowRes.status === 'fulfilled' && nowRes.value.data) {
         const payload = nowRes.value.data;
         const nowPlaying: NowPlaying =
           (payload as { data?: NowPlaying }).data ?? (payload as unknown as NowPlaying);
-        if (nowPlaying?.track && nowPlaying.track.coverArtDataUrl && !nowPlaying.track.coverArt) {
-          nowPlaying.track.coverArt = nowPlaying.track.coverArtDataUrl;
+        if (nowPlaying?.track) {
+          if (nowPlaying.track.coverArtDataUrl && !nowPlaying.track.coverArt) {
+            nowPlaying.track.coverArt = nowPlaying.track.coverArtDataUrl;
+          }
+          setNowPlaying(nowPlaying);
+          if (nowPlaying?.streamUrl) {
+            useRadioStore.getState().setStreamUrl(nowPlaying.streamUrl);
+          }
         }
-        setNowPlaying(nowPlaying);
-        if (nowPlaying?.streamUrl) {
-          useRadioStore.getState().setStreamUrl(nowPlaying.streamUrl);
-        }
-      } else {
-        setNowPlaying(null);
       }
+      // If nowRes fails, do NOT set nowPlaying to null: keep existing active track from webPlaylist!
 
-      if (histRes.status === 'fulfilled') {
+      if (histRes.status === 'fulfilled' && histRes.value.data) {
         const payload = histRes.value.data;
         const history: PlaybackHistory[] =
           (payload as { data?: PlaybackHistory[] }).data ?? (payload as unknown as PlaybackHistory[]);
-        setHistory(Array.isArray(history) ? history : []);
+        if (Array.isArray(history) && history.length > 0) {
+          setHistory(history);
+        }
       }
 
-      if (bannerRes.status === 'fulfilled') {
+      if (bannerRes.status === 'fulfilled' && bannerRes.value.data) {
         const payload = bannerRes.value.data;
         const banner: BroadcastBanner =
           (payload as { data?: BroadcastBanner }).data ?? (payload as unknown as BroadcastBanner);
-        setBanner(banner?.active ? banner : null);
+        if (banner?.active) {
+          setBanner(banner);
+        }
       }
     } catch {
-      setNowPlaying(null);
+      // Graceful offline fallback: preserve current player state
     }
   }, [setNowPlaying, setHistory, setBanner]);
 
   useEffect(() => {
-    // Initial fetch immediately
+    // Initial fetch
     void fetchNowPlaying();
 
     // Then poll
@@ -60,9 +65,12 @@ export function useNowPlaying() {
     }, POLL_INTERVAL_MS);
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
   }, [fetchNowPlaying]);
 
-  return { refetch: fetchNowPlaying };
+  return { refresh: fetchNowPlaying };
 }

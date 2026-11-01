@@ -44,9 +44,9 @@ export function AlbumArt({
 }: AlbumArtProps) {
   const [error, setError] = useState(false);
   // Support passing a track object directly for convenience
-  const imgSrc = src ?? track?.coverArt ?? track?.coverArtDataUrl ?? null;
+  const imgSrc = (error ? null : (src ?? track?.coverArt ?? track?.coverArtDataUrl)) || '/images/player-album-art.jpg';
   const imgAlt = alt ?? (track ? `${track.title} — ${track.artist}` : 'Capa do álbum');
-  const showFallback = !imgSrc || error;
+  const showFallback = error && !imgSrc;
 
   return (
     <div

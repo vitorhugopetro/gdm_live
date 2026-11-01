@@ -14,6 +14,23 @@
     ],
     "headers": [
       {
+        "source": "**/*.@(mp3)",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "audio/mpeg"
+          },
+          {
+            "key": "Accept-Ranges",
+            "value": "bytes"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      },
+      {
         "source": "**/*.@(js|css|woff|woff2|ttf|eot)",
         "headers": [
           {

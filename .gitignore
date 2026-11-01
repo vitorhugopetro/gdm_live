@@ -76,5 +76,6 @@ coverage/
 
 
 server/data/
+data/
 frontend/.env.development
 
