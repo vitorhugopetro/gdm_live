@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Layout from '@/components/Layout/Layout';
 import HomePage from '@/pages/HomePage';
 import ProgramPage from '@/pages/ProgramPage';
+import CommunityPage from '@/pages/CommunityPage';
 import AboutPage from '@/pages/AboutPage';
 import AdminPage from '@/pages/AdminPage';
 import AdminLoginPage from '@/pages/AdminLoginPage';
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="programacao" element={<ProgramPage />} />
+          <Route path="comunidade" element={<CommunityPage />} />
           <Route path="sobre" element={<AboutPage />} />
         </Route>
 
@@ -72,4 +74,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-

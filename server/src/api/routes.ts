@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { library } from '../library/library';
 import { scheduler } from '../scheduler/scheduler';
 import { streamer } from '../streaming/ffmpeg-stream';
+import { community } from '../community/community';
 import { requireAuth } from '../middleware/auth';
 import { config } from '../config';
 import { logger } from '../config/logger';
@@ -35,6 +36,7 @@ router.get('/now-playing', (_req: Request, res: Response) => {
     listenerCount: streamer.getListenerCount(),
     isLive: streamer.isCurrentlyPlaying(),
     programMode: schedulerCfg.mode,
+    requestedBy: scheduler.getCurrentRequestedBy(),
   };
 
   ok(res, nowPlaying);
@@ -115,6 +117,8 @@ router.get('/upcoming', (_req: Request, res: Response) => {
 
 router.get('/status', (_req: Request, res: Response) => {
   const stats = library.getStats();
+  community.updateListenerCount(streamer.getListenerCount());
+
   ok(res, {
     status: 'ok',
     uptime: process.uptime(),
@@ -132,8 +136,115 @@ router.get('/status', (_req: Request, res: Response) => {
   });
 });
 
+// ─── PEDIDOS DE LOUVOR (SONG REQUESTS) ────────────────────────────────────────
+
+router.post('/requests', (req: Request, res: Response) => {
+  const { trackId, requesterName, requesterCity } = req.body || {};
+  if (!trackId) {
+    fail(res, 'O identificador da música é obrigatório.');
+    return;
+  }
+
+  const result = scheduler.requestTrack(trackId, requesterName || 'Ouvinte', requesterCity);
+  if (!result.success) {
+    fail(res, result.message, 400);
+    return;
+  }
+
+  ok(res, result);
+});
+
+router.get('/requests', (req: Request, res: Response) => {
+  const limit = Math.min(50, Math.max(1, parseInt((req.query.limit as string) || '20', 10)));
+  ok(res, scheduler.getRequests(limit));
+});
+
+// ─── MURAL DE ORAÇÃO (PRAYER WALL) ────────────────────────────────────────────
+
+router.get('/prayers', (req: Request, res: Response) => {
+  const limit = Math.min(100, Math.max(1, parseInt((req.query.limit as string) || '50', 10)));
+  ok(res, community.getPrayers(limit));
+});
+
+router.post('/prayers', (req: Request, res: Response) => {
+  const { name, request, city } = req.body || {};
+  if (!request || !request.trim()) {
+    fail(res, 'O pedido de oração não pode ser vazio.');
+    return;
+  }
+
+  const entry = community.addPrayer(name || 'Ouvinte', request, city);
+  ok(res, entry, 201);
+});
+
+router.post('/prayers/:id/pray', (req: Request, res: Response) => {
+  const success = community.prayFor(req.params.id);
+  if (!success) {
+    fail(res, 'Pedido de oração não encontrado.', 404);
+    return;
+  }
+  ok(res, { message: 'Amém! Sua intercessão foi registrada com sucesso.' });
+});
+
+// ─── TESTEMUNHOS (TESTIMONIES) ────────────────────────────────────────────────
+
+router.get('/testimonies', (req: Request, res: Response) => {
+  const limit = Math.min(50, Math.max(1, parseInt((req.query.limit as string) || '20', 10)));
+  ok(res, community.getTestimonies(limit));
+});
+
+router.post('/testimonies', (req: Request, res: Response) => {
+  const { name, title, testimony, city } = req.body || {};
+  if (!testimony || !testimony.trim()) {
+    fail(res, 'O testemunho não pode ser vazio.');
+    return;
+  }
+
+  const entry = community.addTestimony(name || 'Ouvinte', title || 'Testemunho', testimony, city);
+  ok(res, entry, 201);
+});
+
+// ─── RECADOS DOS OUVINTES (LIVE GREETINGS FEED) ───────────────────────────────
+
+router.get('/messages', (req: Request, res: Response) => {
+  const limit = Math.min(50, Math.max(1, parseInt((req.query.limit as string) || '30', 10)));
+  ok(res, community.getMessages(limit));
+});
+
+router.post('/messages', (req: Request, res: Response) => {
+  const { name, message, city } = req.body || {};
+  if (!message || !message.trim()) {
+    fail(res, 'A mensagem não pode ser vazia.');
+    return;
+  }
+
+  const entry = community.addMessage(name || 'Ouvinte', message, city);
+  ok(res, entry, 201);
+});
+
+// ─── AVISO / BANNER DA ESTAÇÃO ────────────────────────────────────────────────
+
+router.get('/banner', (_req: Request, res: Response) => {
+  ok(res, community.getBanner());
+});
+
+router.post('/admin/banner', requireAuth, (req: Request, res: Response) => {
+  const { message, active } = req.body || {};
+  if (typeof message !== 'string') {
+    fail(res, 'Mensagem inválida.');
+    return;
+  }
+  const updated = community.setBanner(message, active ?? true);
+  ok(res, updated);
+});
+
+// ─── ANALYTICS ────────────────────────────────────────────────────────────────
+
+router.get('/analytics', (_req: Request, res: Response) => {
+  ok(res, community.getAnalytics());
+});
+
 // ─── SSE /api/events ──────────────────────────────────────────────────────────
-// Server-Sent Events for real-time now-playing updates
 
 router.get('/events', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
@@ -147,7 +258,6 @@ router.get('/events', (req: Request, res: Response) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  // Send initial state
   sendEvent('connected', { message: 'GDM Live Radio SSE connected' });
 
   const nowPlayingInterval = setInterval(() => {
@@ -160,11 +270,11 @@ router.get('/events', (req: Request, res: Response) => {
       listenerCount: streamer.getListenerCount(),
       isLive: streamer.isCurrentlyPlaying(),
       programMode: scheduler.getConfig().mode,
+      requestedBy: scheduler.getCurrentRequestedBy(),
     };
     sendEvent('nowPlaying', nowPlaying);
   }, 5000);
 
-  // Heartbeat to keep connection alive
   const heartbeatInterval = setInterval(() => {
     res.write(': heartbeat\n\n');
   }, 30000);
@@ -179,7 +289,6 @@ router.get('/events', (req: Request, res: Response) => {
 
 router.post('/admin/sync', requireAuth, async (_req: Request, res: Response) => {
   logger.info('Admin triggered library sync');
-  // Non-blocking
   library.sync().catch((err: Error) =>
     logger.error('Admin sync failed', { error: err.message })
   );
@@ -197,7 +306,6 @@ router.get('/admin/logs', requireAuth, (req: Request, res: Response) => {
 
 router.patch('/admin/config', requireAuth, (req: Request, res: Response) => {
   const patch = req.body as AdminConfigPatch;
-
   const schedulerPatch: Partial<{ mode: 'random' | 'sequential' | 'playlist'; avoidRepeatWithin: number; crossfadeSeconds: number }> = {};
 
   if (patch.mode !== undefined) {
@@ -262,6 +370,21 @@ router.get('/admin/listeners', requireAuth, (_req: Request, res: Response) => {
   ok(res, {
     count: streamer.getListenerCount(),
     listeners: streamer.getListeners(),
+  });
+});
+
+// ─── ADMIN: PATCH /api/admin/tracks/:id/toggle ───────────────────────────────
+
+router.patch('/admin/tracks/:id/toggle', requireAuth, (req: Request, res: Response) => {
+  const toggled = library.toggleTrackAvailability(req.params.id);
+  if (!toggled) {
+    fail(res, 'Track not found', 404);
+    return;
+  }
+  const track = library.getById(req.params.id);
+  ok(res, {
+    message: `Track "${track?.title}" availability updated`,
+    availableForPlayback: track?.availableForPlayback,
   });
 });
 

@@ -1,17 +1,28 @@
-// Core track data from the library
+// =============================================================================
+// GDM Live Radio — Shared Frontend Types
+// =============================================================================
+
+// Connection states for the audio player
+export type ConnectionState =
+  | 'idle'
+  | 'connecting'
+  | 'playing'
+  | 'paused'
+  | 'buffering'
+  | 'loading'
+  | 'reconnecting'
+  | 'error'
+  | 'offline';
+
+// A single track in the library
 export interface Track {
   id: string;
   title: string;
   artist: string;
   album?: string;
   duration: number; // seconds
-  coverArt?: string; // URL (alias for coverArtDataUrl from server)
-  coverArtDataUrl?: string; // base64 data URL from server
-  genre?: string;
-  year?: number;
-  filePath?: string;
-  addedAt?: string; // ISO date
-  playCount?: number;
+  coverArt?: string; // URL
+  coverArtDataUrl?: string; // base64 data URL
   tags?: string[];
   // Library metadata fields (from server)
   format?: string;
@@ -31,9 +42,76 @@ export interface NowPlaying {
   listenerCount?: number;
   isLive?: boolean;
   programMode?: 'random' | 'sequential' | 'playlist';
+  requestedBy?: {
+    name: string;
+    city?: string;
+  } | null;
   // Legacy field alias
   elapsed?: number;
   listeners?: number;
+}
+
+// Community & Spiritual Types
+export interface PrayerRequest {
+  id: string;
+  name: string;
+  city?: string;
+  request: string;
+  prayerCount: number;
+  prayedCount?: number;
+  isAnonymous?: boolean;
+  createdAt: string;
+}
+
+export interface Testimony {
+  id: string;
+  name: string;
+  city?: string;
+  title?: string;
+  testimony?: string;
+  story?: string;
+  createdAt: string;
+}
+
+export interface ListenerMessage {
+  id: string;
+  name?: string;
+  sender?: string;
+  city?: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface SongRequest {
+  id: string;
+  trackId: string;
+  trackTitle: string;
+  trackArtist: string;
+  requesterName: string;
+  requesterCity?: string;
+  requestedAt: string;
+  status: 'pending' | 'playing' | 'played';
+}
+
+export interface BroadcastBanner {
+  message: string;
+  active?: boolean;
+  enabled?: boolean;
+  updatedAt?: string;
+}
+
+export interface AnalyticsStats {
+  totalListeners: number;
+  peakListeners: number;
+  totalPlays: number;
+  totalRequests: number;
+  totalPrayers: number;
+  mostPlayed: Array<{
+    trackId: string;
+    title: string;
+    artist: string;
+    playCount: number;
+  }>;
 }
 
 // An entry in the playback history
@@ -86,36 +164,7 @@ export interface SystemStatus {
   };
 }
 
-// Connection states for the audio player
-export type ConnectionState =
-  | 'idle'
-  | 'connecting'
-  | 'loading'
-  | 'playing'
-  | 'paused'
-  | 'reconnecting'
-  | 'offline'
-  | 'error';
-
-// Admin log entry
-export interface LogEntry {
-  id?: string;
-  timestamp: string; // ISO date
-  level: 'info' | 'warn' | 'error';
-  message: string;
-  meta?: Record<string, unknown>;
-}
-
-// API response wrapper
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-  timestamp?: string;
-}
-
-// Paginated API response
+// Standard paginated response from backend
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -124,23 +173,10 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// Schedule entry (for program page)
-export interface ScheduleEntry {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: string; // HH:mm
-  endTime: string;   // HH:mm
-  days: number[];    // 0=Sun … 6=Sat
-  type: 'music' | 'program' | 'special';
-}
-
-// Admin settings / config
-export interface AdminSettings {
-  streamUrl: string;
-  maxHistoryItems: number;
-  shuffleEnabled: boolean;
-  crossfadeDuration: number; // seconds
-  autoSyncEnabled: boolean;
-  syncIntervalHours: number;
+// Standard API wrapper response
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data: T;
+  error?: string;
+  timestamp?: string;
 }

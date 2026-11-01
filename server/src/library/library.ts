@@ -226,6 +226,14 @@ class LibraryManager extends EventEmitter {
 
   // ── Internal Mutations (used by watcher/admin) ─────────────────────────────
 
+  toggleTrackAvailability(id: string): boolean {
+    const track = this.tracks.get(id);
+    if (!track) return false;
+    track.availableForPlayback = !track.availableForPlayback;
+    this.emit('trackUpdated', track);
+    return true;
+  }
+
   removeTrack(id: string): boolean {
     const track = this.tracks.get(id);
     if (!track) return false;

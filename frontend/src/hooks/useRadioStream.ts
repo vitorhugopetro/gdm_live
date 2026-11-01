@@ -18,7 +18,23 @@ export function useRadioStream() {
     setConnectionState,
     setIsPlaying,
     setReconnectAttempt,
+    sleepTimerEndsAt,
+    setSleepTimer,
   } = useRadioStore();
+
+  // Sleep Timer Watcher
+  useEffect(() => {
+    if (!sleepTimerEndsAt) return;
+
+    const timer = setInterval(() => {
+      if (Date.now() >= sleepTimerEndsAt) {
+        setIsPlaying(false);
+        setSleepTimer(null);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [sleepTimerEndsAt, setIsPlaying, setSleepTimer]);
 
   // Create audio element once
   useEffect(() => {

@@ -1,24 +1,24 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useRadioStore } from '@/store/radioStore';
-import type { NowPlaying, PlaybackHistory } from '@/types';
+import type { NowPlaying, PlaybackHistory, BroadcastBanner } from '@/types';
 
 const POLL_INTERVAL_MS = 10_000;
 
 export function useNowPlaying() {
-  const { setNowPlaying, setHistory } = useRadioStore();
+  const { setNowPlaying, setHistory, setBanner } = useRadioStore();
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchNowPlaying = useCallback(async () => {
     try {
-      const [nowRes, histRes] = await Promise.allSettled([
+      const [nowRes, histRes, bannerRes] = await Promise.allSettled([
         api.get<{ data: NowPlaying }>('/api/now-playing'),
         api.get<{ data: PlaybackHistory[] }>('/api/history?limit=10'),
+        api.get<{ data: BroadcastBanner }>('/api/banner'),
       ]);
 
       if (nowRes.status === 'fulfilled') {
         const payload = nowRes.value.data;
-        // Support both { data: ... } wrapper and direct response
         const nowPlaying: NowPlaying =
           (payload as { data?: NowPlaying }).data ?? (payload as unknown as NowPlaying);
         if (nowPlaying?.track && nowPlaying.track.coverArtDataUrl && !nowPlaying.track.coverArt) {
@@ -26,7 +26,6 @@ export function useNowPlaying() {
         }
         setNowPlaying(nowPlaying);
       } else {
-        // API unavailable — clear now playing so UI shows unavailable state
         setNowPlaying(null);
       }
 
@@ -36,10 +35,17 @@ export function useNowPlaying() {
           (payload as { data?: PlaybackHistory[] }).data ?? (payload as unknown as PlaybackHistory[]);
         setHistory(Array.isArray(history) ? history : []);
       }
+
+      if (bannerRes.status === 'fulfilled') {
+        const payload = bannerRes.value.data;
+        const banner: BroadcastBanner =
+          (payload as { data?: BroadcastBanner }).data ?? (payload as unknown as BroadcastBanner);
+        setBanner(banner?.active ? banner : null);
+      }
     } catch {
       setNowPlaying(null);
     }
-  }, [setNowPlaying, setHistory]);
+  }, [setNowPlaying, setHistory, setBanner]);
 
   useEffect(() => {
     // Initial fetch immediately

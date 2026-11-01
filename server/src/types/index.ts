@@ -25,6 +25,10 @@ export interface NowPlaying {
   listenerCount: number;
   isLive: boolean;
   programMode: 'random' | 'sequential' | 'playlist';
+  requestedBy?: {
+    name: string;
+    city?: string;
+  } | null;
 }
 
 export interface PlaybackHistory {
@@ -47,6 +51,65 @@ export interface ProgramSchedulerConfig {
   mode: 'random' | 'sequential' | 'playlist';
   avoidRepeatWithin: number; // minutes
   crossfadeSeconds: number;
+}
+
+// ─── Community & Spiritual Features ──────────────────────────────────────────
+
+export interface PrayerRequest {
+  id: string;
+  name: string;
+  city?: string;
+  request: string;
+  prayerCount: number;
+  createdAt: string;
+}
+
+export interface Testimony {
+  id: string;
+  name: string;
+  city?: string;
+  title: string;
+  testimony: string;
+  createdAt: string;
+}
+
+export interface ListenerMessage {
+  id: string;
+  name: string;
+  city?: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface SongRequest {
+  id: string;
+  trackId: string;
+  trackTitle: string;
+  trackArtist: string;
+  requesterName: string;
+  requesterCity?: string;
+  requestedAt: string;
+  status: 'pending' | 'playing' | 'played';
+}
+
+export interface BroadcastBanner {
+  message: string;
+  active: boolean;
+  updatedAt: string;
+}
+
+export interface AnalyticsStats {
+  totalListeners: number;
+  peakListeners: number;
+  totalPlays: number;
+  totalRequests: number;
+  totalPrayers: number;
+  mostPlayed: Array<{
+    trackId: string;
+    title: string;
+    artist: string;
+    playCount: number;
+  }>;
 }
 
 // ─── API Response Types ───────────────────────────────────────────────────────

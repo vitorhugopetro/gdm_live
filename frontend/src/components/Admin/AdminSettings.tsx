@@ -1,5 +1,5 @@
-import { useState, FormEvent } from 'react';
-import { Save } from 'lucide-react';
+import { useState, useEffect, FormEvent } from 'react';
+import { Save, Megaphone } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
@@ -12,7 +12,23 @@ export default function AdminSettings() {
   const [crossfade, setCrossfade] = useState(3);
   const [bitrate, setBitrate] = useState(128);
   const [saving, setSaving] = useState(false);
+
+  // Banner State
+  const [bannerMessage, setBannerMessage] = useState('');
+  const [bannerEnabled, setBannerEnabled] = useState(true);
+  const [savingBanner, setSavingBanner] = useState(false);
+
   const { getToken } = useAuthStore();
+
+  useEffect(() => {
+    // Load current banner
+    api.get('/api/banner').then((res) => {
+      if (res.data?.data) {
+        setBannerMessage(res.data.data.message || '');
+        setBannerEnabled(res.data.data.enabled ?? true);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,8 +53,73 @@ export default function AdminSettings() {
     }
   };
 
+  const handleSaveBanner = async (e: FormEvent) => {
+    e.preventDefault();
+    setSavingBanner(true);
+    try {
+      const token = await getToken();
+      await api.post(
+        '/api/banner',
+        { message: bannerMessage, enabled: bannerEnabled },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Faixa de avisos atualizada na rádio!');
+    } catch {
+      toast.error('Erro ao atualizar aviso.');
+    } finally {
+      setSavingBanner(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl space-y-6">
+      {/* Broadcast Banner Manager */}
+      <form onSubmit={handleSaveBanner} className="bg-gdm-card border border-gdm-border rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Megaphone className="w-5 h-5 text-gdm-purple" />
+          <h2 className="text-gdm-text font-semibold text-lg">Faixa de Avisos e Recados Ao Vivo</h2>
+        </div>
+        <p className="text-gdm-muted text-xs">
+          Esta mensagem é exibida no topo do site para todos os ouvintes em tempo real.
+        </p>
+
+        <div>
+          <label className="block text-gdm-text text-sm font-medium mb-1">
+            Mensagem do Aviso
+          </label>
+          <input
+            type="text"
+            value={bannerMessage}
+            onChange={(e) => setBannerMessage(e.target.value)}
+            placeholder="Ex: 🙏 Culto de Louvor e Adoração hoje às 19h30! Ouça e compartilhe."
+            className="w-full bg-gdm-dark border border-gdm-border rounded-xl px-4 py-2 text-gdm-text text-sm focus:outline-none focus:ring-2 focus:ring-gdm-purple/50"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="banner-enabled"
+            checked={bannerEnabled}
+            onChange={(e) => setBannerEnabled(e.target.checked)}
+            className="w-4 h-4 rounded text-gdm-purple accent-gdm-purple"
+          />
+          <label htmlFor="banner-enabled" className="text-xs text-gdm-text-secondary cursor-pointer">
+            Ativar exibição da faixa no topo
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          disabled={savingBanner}
+          className="flex items-center gap-2 px-5 py-2 bg-gdm-purple hover:bg-gdm-purple/80 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors shadow-gdm"
+        >
+          <Save className="w-4 h-4" />
+          {savingBanner ? 'Salvando...' : 'Atualizar Faixa de Avisos'}
+        </button>
+      </form>
+
+      {/* Scheduler Configuration */}
       <form onSubmit={handleSave} className="bg-gdm-card border border-gdm-border rounded-2xl p-6 space-y-6">
         <h2 className="text-gdm-text font-semibold text-lg">Configurações da programação</h2>
 
@@ -61,19 +142,12 @@ export default function AdminSettings() {
               </button>
             ))}
           </div>
-          <p className="text-gdm-muted text-xs mt-1.5">
-            {mode === 'random'
-              ? 'Músicas selecionadas aleatoriamente, evitando repetições recentes.'
-              : mode === 'sequential'
-              ? 'Músicas reproduzidas em sequência, na ordem da biblioteca.'
-              : 'Músicas reproduzidas em uma lista definida.'}
-          </p>
         </div>
 
         {/* Avoid repeat */}
         <div>
           <label className="block text-gdm-text text-sm font-medium mb-2">
-            Evitar repetição por (minutos)
+            Evitar repetição (minutos)
           </label>
           <input
             type="number"
@@ -138,11 +212,9 @@ export default function AdminSettings() {
         <ul className="space-y-2 text-gdm-muted text-sm">
           <li>• As configurações são aplicadas imediatamente ao motor de programação.</li>
           <li>• A mudança de bitrate afeta novos streams — ouvintes conectados precisarão reconectar.</li>
-          <li>• Configurações não são persistidas após reinicialização do servidor nesta versão.</li>
-          <li>• Para configurações permanentes, edite o arquivo <code className="text-gdm-purple">.env</code> do servidor.</li>
+          <li>• Configurações são sincronizadas com o servidor de transmissão da GDM Live Radio.</li>
         </ul>
       </div>
     </div>
   );
 }
-
