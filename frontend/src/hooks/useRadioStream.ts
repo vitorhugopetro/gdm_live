@@ -74,8 +74,18 @@ export function useRadioStream() {
     if (!audio) return;
 
     // For live radio: re-set src to force reload from live edge
+    const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+    let targetUrl = streamUrl;
+    if (isHttps && targetUrl.startsWith('http://')) {
+      if (targetUrl.startsWith('http://localhost') || targetUrl.startsWith('http://127.0.0.1')) {
+        targetUrl = '/stream';
+      } else {
+        targetUrl = targetUrl.replace('http://', 'https://');
+      }
+    }
+
     audio.src = '';
-    audio.src = streamUrl;
+    audio.src = targetUrl;
     audio.volume = playerMuted ? 0 : playerVolume;
     audio.load();
 

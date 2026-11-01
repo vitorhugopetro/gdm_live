@@ -79,57 +79,104 @@ export function RedesignedHero() {
           </div>
         </div>
 
-        {/* Coluna Direita: Emblema Celestial 3D + Cruz Dourada + Adoração */}
+        {/* Coluna Direita: Emblema Celestial 3D + Adorador na Colina + Cruz Luminosa */}
         <div className="lg:col-span-6 relative flex flex-col items-center justify-center">
           {/* Círculo de Brilho Divino de Fundo */}
-          <div className="relative w-full max-w-md aspect-square flex items-center justify-center">
+          <div className="relative w-full max-w-lg aspect-[4/3] flex items-center justify-center">
             {/* Anéis de Luz Celestial */}
             <div className="absolute inset-0 rounded-full border border-[#7000FF]/30 animate-pulse-slow" />
             <div className="absolute inset-8 rounded-full border border-[#FFC928]/25" />
-            <div className="absolute inset-16 rounded-full bg-gradient-to-br from-[#7000FF]/20 via-[#FFC928]/15 to-transparent blur-2xl" />
+            <div className="absolute inset-16 rounded-full bg-gradient-to-br from-[#7000FF]/25 via-[#FFC928]/20 to-transparent blur-3xl" />
 
-            {/* Emblema Central Dourado com Cruz Luminosa */}
-            <div className="relative z-10 flex flex-col items-center text-center p-6">
-              <div className="w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center drop-shadow-[0_0_35px_rgba(255,201,40,0.6)]">
-                <svg viewBox="0 0 100 80" className="w-full h-full fill-none">
-                  {/* Ondas Sonoras Esquerda */}
-                  <rect x="6" y="32" width="3.5" height="16" rx="1.75" fill="#FFC928" />
-                  <rect x="13" y="22" width="3.5" height="36" rx="1.75" fill="#FFC928" />
-                  <rect x="20" y="12" width="3.5" height="56" rx="1.75" fill="#FFC928" />
+            {/* Cena Ilustrada em SVG: Montanha, Cruz Radiante e Adorador */}
+            <svg
+              viewBox="0 0 500 360"
+              className="w-full h-full drop-shadow-[0_0_40px_rgba(255,201,40,0.5)] select-none pointer-events-none"
+            >
+              <defs>
+                <linearGradient id="hero-gold-play" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#FFF7D6" />
+                  <stop offset="30%" stopColor="#FFC928" />
+                  <stop offset="75%" stopColor="#D49A00" />
+                  <stop offset="100%" stopColor="#805C00" />
+                </linearGradient>
 
-                  {/* Triângulo Play 3D */}
-                  <path
-                    d="M32 14 C32 10, 37 7.5, 41 9.8 L86 36.8 C90 39.2, 90 44.8, 86 47.2 L41 74.2 C37 76.5, 32 74, 32 70 Z"
-                    fill="url(#hero-gold-play)"
-                    stroke="#FFE58F"
-                    strokeWidth="2"
-                  />
+                <radialGradient id="cross-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#FFF2B2" stopOpacity="0.9" />
+                  <stop offset="30%" stopColor="#FFC928" stopOpacity="0.6" />
+                  <stop offset="70%" stopColor="#7000FF" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+                </radialGradient>
+              </defs>
 
-                  {/* Cruz Central Luminosa */}
-                  <rect x="49" y="24" width="4.5" height="34" rx="2" fill="#FFFFFF" />
-                  <rect x="41" y="33" width="20.5" height="4.5" rx="2" fill="#FFFFFF" />
+              {/* Raios de Luz Dourada ao Fundo da Cruz */}
+              <circle cx="410" cy="140" r="90" fill="url(#cross-glow)" />
+              <line x1="410" y1="50" x2="410" y2="230" stroke="#FFE58F" strokeWidth="1" strokeOpacity="0.4" />
+              <line x1="320" y1="140" x2="500" y2="140" stroke="#FFE58F" strokeWidth="1" strokeOpacity="0.4" />
+              <line x1="346" y1="76" x2="474" y2="204" stroke="#FFE58F" strokeWidth="1" strokeOpacity="0.3" />
+              <line x1="346" y1="204" x2="474" y2="76" stroke="#FFE58F" strokeWidth="1" strokeOpacity="0.3" />
 
-                  <defs>
-                    <linearGradient id="hero-gold-play" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#FFF5CC" />
-                      <stop offset="30%" stopColor="#FFC928" />
-                      <stop offset="75%" stopColor="#D49A00" />
-                      <stop offset="100%" stopColor="#805C00" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
+              {/* Silhueta da Colina ao Fundo */}
+              <path
+                d="M 280 280 Q 360 220, 410 215 Q 460 215, 500 250 L 500 360 L 280 360 Z"
+                fill="#0E1020"
+                opacity="0.95"
+              />
 
-              {/* Título de Marca no Emblema */}
-              <div className="mt-2 font-black text-2xl sm:text-3xl text-white tracking-wide">
-                GDM <span className="text-[#FFC928]">LIVE RADIO</span>
-              </div>
-              <div className="text-sm font-semibold text-[#FFC928] italic font-serif mt-0.5">
-                Graça Digital!
+              {/* Cruz Iluminada na Colina */}
+              <g transform="translate(406, 110)">
+                <rect x="2" y="0" width="4" height="48" rx="2" fill="#FFE58F" filter="drop-shadow(0 0 8px #FFC928)" />
+                <rect x="-10" y="12" width="28" height="4" rx="2" fill="#FFE58F" filter="drop-shadow(0 0 8px #FFC928)" />
+              </g>
+
+              {/* Silhueta do Adorador de Braços Abertos */}
+              <g transform="translate(345, 175) scale(0.9)" fill="#07070D" stroke="#0B0B16" strokeWidth="0.5">
+                {/* Cabeça */}
+                <circle cx="20" cy="10" r="5.5" />
+                {/* Tronco */}
+                <path d="M 16 16 L 24 16 L 23 48 L 17 48 Z" />
+                {/* Braço Esquerdo Erguido em Adoração */}
+                <path d="M 16 19 L 0 5 L 2 2 L 18 16 Z" />
+                {/* Braço Direito Erguido em Adoração */}
+                <path d="M 24 19 L 40 5 L 38 2 L 22 16 Z" />
+                {/* Pernas */}
+                <path d="M 17 48 L 12 75 L 16 76 L 19 48 Z" />
+                <path d="M 23 48 L 28 75 L 24 76 L 21 48 Z" />
+              </g>
+
+              {/* Ondas Sonoras Esquerda do Emblema */}
+              <g transform="translate(30, 95)">
+                <rect x="0" y="32" width="5" height="24" rx="2.5" fill="#FFC928" />
+                <rect x="10" y="18" width="5" height="52" rx="2.5" fill="#FFC928" />
+                <rect x="20" y="4" width="5" height="80" rx="2.5" fill="#FFC928" />
+
+                {/* Triângulo Play Dourado 3D */}
+                <path
+                  d="M 36 6 C 36 1, 43 -2, 48 1 L 115 42 C 120 45, 120 53, 115 56 L 48 97 C 43 100, 36 97, 36 92 Z"
+                  fill="url(#hero-gold-play)"
+                  stroke="#FFE58F"
+                  strokeWidth="2.5"
+                />
+
+                {/* Cruz Branca Luminosa no Centro do Play */}
+                <rect x="62" y="24" width="6.5" height="50" rx="3" fill="#FFFFFF" />
+                <rect x="50" y="38" width="30.5" height="6.5" rx="3" fill="#FFFFFF" />
+              </g>
+            </svg>
+
+            {/* Texto de Marca Oficial sobreposto com tipografia idêntica ao mockup */}
+            <div className="absolute -bottom-2 left-6 right-6 flex flex-col items-start z-20">
+              <div className="flex items-baseline gap-2">
+                <span className="font-black text-2xl sm:text-3xl text-white tracking-wide drop-shadow-lg">
+                  GDM <span className="text-[#FFC928]">LIVE RADIO</span>
+                </span>
+                <span className="text-sm font-semibold text-[#FFC928] italic font-serif">
+                  Graça Digital!
+                </span>
               </div>
 
               {/* Tagline Oficial Espaçada */}
-              <div className="mt-4 pt-3 border-t border-[#FFC928]/30 text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-[#FFC928] flex items-center justify-center gap-2">
+              <div className="mt-1 text-xs font-black tracking-[0.35em] uppercase text-[#FFC928] flex items-center gap-2">
                 <span>FÉ</span>
                 <span className="text-[#7000FF]">•</span>
                 <span>MÚSICA</span>
@@ -139,8 +186,8 @@ export function RedesignedHero() {
             </div>
           </div>
 
-          {/* Caligrafia Cursiva Inspiracional */}
-          <div className="mt-2 text-center lg:text-right w-full pr-4">
+          {/* Caligrafia Cursiva Inspiracional posicionada exatamente como no mockup */}
+          <div className="mt-4 text-center lg:text-right w-full pr-4">
             <p className="font-serif italic text-lg sm:text-xl text-[#FFE58F] drop-shadow-[0_2px_8px_rgba(255,201,40,0.4)]">
               "Conectando você a Deus através da música!"
             </p>
@@ -150,3 +197,4 @@ export function RedesignedHero() {
     </section>
   );
 }
+

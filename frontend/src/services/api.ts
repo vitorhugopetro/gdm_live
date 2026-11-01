@@ -1,9 +1,22 @@
 import axios from 'axios';
 import { auth } from '@/config/firebase';
 
-const baseURL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.DEV ? 'http://localhost:3001' : 'https://api.gdmlive.web.app');
+function resolveBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+
+  if (isHttps) {
+    if (envUrl && envUrl.startsWith('https://')) {
+      return envUrl;
+    }
+    // Avoid Mixed Content error on HTTPS
+    return '';
+  }
+
+  return envUrl || (import.meta.env.DEV ? 'http://localhost:3001' : '');
+}
+
+const baseURL = resolveBaseUrl();
 
 export const api = axios.create({
   baseURL,

@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import { BroadcastBannerBar } from '@/components/Common/BroadcastBannerBar';
 import { RedesignedFooter } from './RedesignedFooter';
@@ -8,6 +8,8 @@ import { useNowPlaying } from '@/hooks/useNowPlaying';
 export default function Layout() {
   // Poll for now-playing and banner data at root level
   useNowPlaying();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   return (
     <div className="min-h-screen bg-[#07070D] text-white flex flex-col font-sans selection:bg-[#7000FF] selection:text-white">
@@ -22,8 +24,8 @@ export default function Layout() {
       {/* Rodapé Oficial Estilizado */}
       <RedesignedFooter />
 
-      {/* Barra de Player Persistente */}
-      <AudioPlayer />
+      {/* Barra de Player Persistente apenas em páginas secundárias para não duplicar na Home */}
+      {!isHomePage && <AudioPlayer />}
     </div>
   );
 }

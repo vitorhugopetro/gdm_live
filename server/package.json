@@ -10,6 +10,8 @@
     "lint": "node node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "chokidar": "^3.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -18,7 +20,6 @@
     "helmet": "^7.1.0",
     "music-metadata": "^7.13.4",
     "node-cron": "^3.0.3",
-    "chokidar": "^3.6.0",
     "uuid": "^10.0.0",
     "winston": "^3.14.2"
   },

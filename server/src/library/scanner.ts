@@ -8,6 +8,46 @@ import type { Track, ScanResult, ScanError } from '../types';
 
 // Supported audio extensions
 const AUDIO_EXTENSIONS = new Set(['.mp3', '.flac', '.wav', '.ogg', '.m4a', '.aac']);
+const CACHE_PATH = path.join(process.cwd(), 'data', 'library-cache.json');
+
+interface CacheEntry {
+  mtime: string;
+  size: number;
+  track: Track;
+}
+
+function loadCache(): Map<string, CacheEntry> {
+  const map = new Map<string, CacheEntry>();
+  try {
+    if (fs.existsSync(CACHE_PATH)) {
+      const data = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
+      for (const item of data) {
+        if (item && item.track && item.track.filePath) {
+          map.set(item.track.filePath, item);
+        }
+      }
+      logger.info(`Loaded ${map.size} cached tracks from ${CACHE_PATH}`);
+    }
+  } catch (e) {
+    logger.warn('Failed to load library cache, will rescan full library');
+  }
+  return map;
+}
+
+function saveCache(tracks: Track[]): void {
+  try {
+    const data: CacheEntry[] = tracks.map((t) => ({
+      mtime: t.lastModified,
+      size: t.fileSize,
+      track: t,
+    }));
+    fs.mkdirSync(path.dirname(CACHE_PATH), { recursive: true });
+    fs.writeFileSync(CACHE_PATH, JSON.stringify(data), 'utf-8');
+    logger.info(`Saved ${tracks.length} tracks to library cache`);
+  } catch (e) {
+    logger.warn(`Could not save library cache: ${(e as Error).message}`);
+  }
+}
 
 // ─── Filename Parsing ─────────────────────────────────────────────────────────
 
@@ -145,29 +185,48 @@ export async function scanLibrary(
   }
 
   const files = await walkDirectory(libraryPath);
-  logger.info(`Found ${files.length} audio files, reading metadata...`);
+  logger.info(`Found ${files.length} audio files in directory...`);
 
-  // Process files with bounded concurrency (16 at a time)
-  const CONCURRENCY = 16;
-  for (let i = 0; i < files.length; i += CONCURRENCY) {
-    const batch = files.slice(i, i + CONCURRENCY);
-    const results = await Promise.allSettled(batch.map((f) => scanFile(f)));
+  const cache = loadCache();
+  const filesToScan: string[] = [];
 
-    for (let j = 0; j < results.length; j++) {
-      const result = results[j];
-      if (result.status === 'fulfilled') {
-        tracks.push(result.value);
+  for (const filePath of files) {
+    try {
+      const stat = await fs.promises.stat(filePath);
+      const cached = cache.get(filePath);
+      if (cached && cached.mtime === stat.mtime.toISOString() && cached.size === stat.size) {
+        tracks.push(cached.track);
       } else {
-        const filePath = batch[j];
-        const errorMessage = result.reason instanceof Error ? result.reason.message : String(result.reason);
-        logger.warn(`Failed to scan file: ${filePath}`, { error: errorMessage });
-        errors.push({ filePath, error: errorMessage });
+        filesToScan.push(filePath);
+      }
+    } catch {
+      filesToScan.push(filePath);
+    }
+  }
+
+  if (filesToScan.length > 0) {
+    logger.info(`Scanning ${filesToScan.length} files (cached ${tracks.length})...`);
+    // Process files with bounded concurrency (16 at a time)
+    const CONCURRENCY = 16;
+    for (let i = 0; i < filesToScan.length; i += CONCURRENCY) {
+      const batch = filesToScan.slice(i, i + CONCURRENCY);
+      const results = await Promise.allSettled(batch.map((f) => scanFile(f)));
+
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j];
+        if (result.status === 'fulfilled') {
+          tracks.push(result.value);
+        } else {
+          const filePath = batch[j];
+          const errorMessage = result.reason instanceof Error ? result.reason.message : String(result.reason);
+          logger.warn(`Failed to scan file: ${filePath}`, { error: errorMessage });
+          errors.push({ filePath, error: errorMessage });
+        }
       }
     }
-
-    if (i % (CONCURRENCY * 4) === 0 && i > 0) {
-      logger.info(`Scanned ${Math.min(i + CONCURRENCY, files.length)}/${files.length} files...`);
-    }
+    saveCache(tracks);
+  } else {
+    logger.info(`All ${tracks.length} tracks loaded from cache instantly!`);
   }
 
   const durationMs = Date.now() - startTime;

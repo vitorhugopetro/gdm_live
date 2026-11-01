@@ -25,6 +25,9 @@ export function useNowPlaying() {
           nowPlaying.track.coverArt = nowPlaying.track.coverArtDataUrl;
         }
         setNowPlaying(nowPlaying);
+        if (nowPlaying?.streamUrl) {
+          useRadioStore.getState().setStreamUrl(nowPlaying.streamUrl);
+        }
       } else {
         setNowPlaying(null);
       }

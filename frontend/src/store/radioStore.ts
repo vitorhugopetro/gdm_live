@@ -41,8 +41,22 @@ interface RadioState {
   reset: () => void;
 }
 
-const DEFAULT_STREAM_URL =
-  import.meta.env.VITE_STREAM_URL || 'http://localhost:3001/stream';
+function resolveDefaultStreamUrl(): string {
+  const envUrl = import.meta.env.VITE_STREAM_URL;
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+
+  if (isHttps) {
+    // If the stream is https, use it; otherwise avoid Mixed Content by using relative /stream
+    if (envUrl && envUrl.startsWith('https://')) {
+      return envUrl;
+    }
+    return '/stream';
+  }
+
+  return envUrl || 'http://localhost:3001/stream';
+}
+
+const DEFAULT_STREAM_URL = resolveDefaultStreamUrl();
 
 const LOCAL_STORAGE_FAVORITES_KEY = 'gdm_live_favorites';
 
@@ -104,7 +118,16 @@ export const useRadioStore = create<RadioState>()(
 
     setConnectionState: (connectionState) => set({ connectionState }),
 
-    setStreamUrl: (streamUrl) => set({ streamUrl }),
+    setStreamUrl: (streamUrl) => {
+      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const safeUrl =
+        isHttps && streamUrl.startsWith('http://')
+          ? streamUrl.startsWith('http://localhost') || streamUrl.startsWith('http://127.0.0.1')
+            ? '/stream'
+            : streamUrl.replace('http://', 'https://')
+          : streamUrl;
+      set({ streamUrl: safeUrl });
+    },
 
     setReconnectAttempt: (reconnectAttempt) => set({ reconnectAttempt }),
 

@@ -3,11 +3,18 @@ import * as http from 'http';
 import { PassThrough, Readable } from 'stream';
 import { EventEmitter } from 'events';
 import ffmpeg from 'fluent-ffmpeg';
+// @ts-ignore
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import { scheduler } from '../scheduler/scheduler';
 import { logger } from '../config/logger';
 import { config } from '../config';
 import type { Track, StreamListener, StreamMetadata } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+
+if (ffmpegInstaller && ffmpegInstaller.path) {
+  ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+  logger.info(`FFmpeg path configured from installer: ${ffmpegInstaller.path}`);
+}
 
 // ─── Broadcast Stream Manager ─────────────────────────────────────────────────
 // One FFmpeg process transcodes audio -> multiple PassThrough streams (listeners)

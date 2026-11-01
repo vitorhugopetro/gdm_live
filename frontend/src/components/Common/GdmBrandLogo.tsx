@@ -63,3 +63,4 @@ export function GdmBrandLogo({ className = '', size = 'md' }: GdmBrandLogoProps)
     </div>
   );
 }
+

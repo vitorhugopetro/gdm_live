@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export function RedesignedFooter() {
   return (
-    <footer className="bg-[#05050A] border-t border-[#1C223A] pt-8 pb-32 text-xs text-[#7A839E]">
+    <footer className="bg-[#05050A] border-t border-[#1C223A] pt-8 pb-12 text-xs text-[#7A839E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
         {/* Linha Principal da Imagem de Referência */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-4 border-b border-[#1C223A]/80">
@@ -72,3 +72,4 @@ export function RedesignedFooter() {
     </footer>
   );
 }
+
