@@ -114,3 +114,4 @@ export function HelpModal({ onClose }: HelpModalProps) {
     </div>
   );
 }
+

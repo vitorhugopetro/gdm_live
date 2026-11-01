@@ -44,7 +44,9 @@ export default function Layout() {
       </a>
 
       <Header isTVMode={isTVMode} onToggleTVMode={toggleTVMode} />
-      <BroadcastBannerBar data-broadcast-banner />
+      <div data-broadcast-banner>
+        <BroadcastBannerBar />
+      </div>
 
       {/* Main Content Area */}
       <main id="main-content" className="flex-1">
@@ -55,7 +57,11 @@ export default function Layout() {
       <RedesignedFooter />
 
       {/* Barra de Player Persistente apenas em páginas secundárias */}
-      {!isHomePage && <AudioPlayer data-audio-player />}
+      {!isHomePage && (
+        <div data-audio-player>
+          <AudioPlayer />
+        </div>
+      )}
 
       {/* Help Modal (? key or ? button) */}
       {isHelpOpen && <HelpModal onClose={() => setIsHelpOpen(false)} />}

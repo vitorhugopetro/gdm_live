@@ -1,26 +1,14 @@
 import { Play, Pause, Radio, Maximize2 } from 'lucide-react';
 import { useRadioStore } from '@/store/radioStore';
 import { useRadioStream } from '@/hooks/useRadioStream';
-import { useOutletContext } from 'react-router-dom';
 
-interface LayoutContext {
-  isImmersive?: boolean;
-  toggleImmersive?: () => void;
+interface RedesignedHeroProps {
+  onToggleImmersive?: () => void;
 }
 
-export function RedesignedHero() {
+export function RedesignedHero({ onToggleImmersive }: RedesignedHeroProps) {
   const { isPlayerPlaying, connectionState, togglePlay } = useRadioStore();
   const { retry } = useRadioStream();
-
-  // Optional: get immersive toggle from Layout context (gracefully falls back)
-  let toggleImmersive: (() => void) | undefined;
-  try {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const ctx = useOutletContext<LayoutContext>();
-    toggleImmersive = ctx?.toggleImmersive;
-  } catch {
-    // Not inside an Outlet — no context available
-  }
 
   const isLive = connectionState === 'playing';
   const isConnecting = connectionState === 'connecting' || connectionState === 'loading';
@@ -98,9 +86,9 @@ export function RedesignedHero() {
             </div>
 
             {/* Immersive mode button */}
-            {toggleImmersive && (
+            {onToggleImmersive && (
               <button
-                onClick={toggleImmersive}
+                onClick={onToggleImmersive}
                 aria-label="Modo imersivo"
                 title="Tela cheia imersiva (tecla I)"
                 className="flex items-center gap-2 px-4 py-3 rounded-full bg-[#0E1020]/90 border border-[#1C223A] text-xs font-semibold text-[#C9C9D4] hover:text-white hover:border-[#7000FF]/50 transition-colors"
@@ -120,7 +108,6 @@ export function RedesignedHero() {
               alt="GDM Live Radio - Emblema Dourado 3D, Adorador na Colina e Cruz Radiante ao Pôr do Sol"
               className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-[1.02]"
               loading="eager"
-              fetchPriority="high"
             />
             {/* Vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#07070D]/40 via-transparent to-transparent pointer-events-none" />
