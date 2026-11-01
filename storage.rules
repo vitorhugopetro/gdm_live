@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Músicas — somente admin pode escrever, público pode ler (via signed URL)
+    match /music/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Capas de álbum — público pode ler, admin escreve
+    match /covers/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+  }
+}
+

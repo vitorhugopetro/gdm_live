@@ -1,0 +1,20 @@
+{
+  "name": "GDM Live Radio",
+  "short_name": "GDM Radio",
+  "description": "Música autoral cristã tocando no seu coração",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0E1A",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "lang": "pt-BR"
+}

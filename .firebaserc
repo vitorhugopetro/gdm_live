@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "gdm-live-radio",
+    "production": "gdm-live-radio"
+  },
+  "targets": {
+    "gdm-live-radio": {
+      "hosting": {
+        "frontend": [
+          "gdm-live-radio"
+        ]
+      }
+    }
+  }
+}
+

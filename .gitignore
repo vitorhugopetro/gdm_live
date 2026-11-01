@@ -1,0 +1,76 @@
+# ============================================================
+# GDM Live Radio — .gitignore
+# ============================================================
+
+# ─── SEGREDOS E CREDENCIAIS ──────────────────────────────────
+*.json.key
+*-adminsdk-*.json
+gdm-live-radio-firebase-adminsdk-*.json
+.env
+.env.local
+.env.production
+.env.*.local
+service-account*.json
+gcp-key*.json
+
+# ─── MÚSICAS (Nunca commitar no Git) ─────────────────────────
+Minhas_Musicas/
+*.mp3
+*.flac
+*.m4a
+*.aac
+*.ogg
+*.wav
+
+# ─── DEPENDÊNCIAS NODE ───────────────────────────────────────
+node_modules/
+**/node_modules/
+node_modules*/
+**/node_modules*/
+
+# ─── BUILD ───────────────────────────────────────────────────
+frontend/dist/
+frontend/.vite/
+server/dist/
+server/build/
+functions/lib/
+
+# ─── LOGS ────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ─── BANCO DE DADOS LOCAL ────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── SISTEMA OPERACIONAL ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDEs ────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ─── FIREBASE ────────────────────────────────────────────────
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+storage-files/
+
+# ─── CACHE ───────────────────────────────────────────────────
+.cache/
+.turbo/
+*.tsbuildinfo
+
+# ─── COBERTURA DE TESTES ─────────────────────────────────────
+coverage/
+.nyc_output/
+
