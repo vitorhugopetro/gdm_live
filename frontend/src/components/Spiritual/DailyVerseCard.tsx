@@ -61,7 +61,7 @@ export function DailyVerseCard() {
   };
 
   const handleShare = () => {
-    const text = `📖 *Palavra de Fé — GDM Live Radio*\n\n"${current.text}"\n— *${current.reference}*\n\nOuça louvores 24h na rádio: https://gdm-live-radio.web.app`;
+    const text = `📖 *Palavra de Fé — GDM Live Radio*\n\n"${current.text}"\n— *${current.reference}*\n\nOuça louvores 24h na rádio: https://gdmlr.web.app`;
     if (navigator.share) {
       navigator.share({ title: 'Palavra de Fé', text }).catch(() => {});
     } else {

@@ -13,7 +13,7 @@ export function ShareSongModal({ isOpen, onClose, track }: ShareSongModalProps) 
 
   if (!isOpen || !track) return null;
 
-  const appUrl = 'https://gdm-live-radio.web.app';
+  const appUrl = 'https://gdmlr.web.app';
   const shareText = `Estou ouvindo "${track.title}" de ${track.artist} na GDM Live Radio — 24 horas de louvores abençoados! 🎶✨ Ouça você também: ${appUrl}`;
 
   const handleCopy = () => {

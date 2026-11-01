@@ -110,7 +110,7 @@ export default function Header({ isTVMode = false, onToggleTVMode, onToggleHelp 
 
             {/* Botão "Ouvir no App" */}
             <a
-              href="https://gdm-live-radio.web.app"
+              href="https://gdmlr.web.app"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#7000FF] to-[#9B4DFF] hover:from-[#8014FF] hover:to-[#A861FF] text-white text-xs font-bold tracking-wide shadow-[0_0_16px_rgba(112,0,255,0.4)] transition-all duration-200 hover:scale-105"
@@ -231,7 +231,7 @@ export default function Header({ isTVMode = false, onToggleTVMode, onToggleHelp 
               </a>
 
               <a
-                href="https://gdm-live-radio.web.app"
+                href="https://gdmlr.web.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
