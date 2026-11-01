@@ -22,11 +22,11 @@ export function RedesignedFooter() {
 
             <div className="flex items-center gap-3">
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@gra%C3%A7adigitalmusic"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-[#0E1020] border border-[#1C223A] flex items-center justify-center text-[#C9C9D4] hover:text-[#FFC928] hover:border-[#FFC928] transition-all"
-                aria-label="YouTube da Graça Digital"
+                className="w-8 h-8 rounded-full bg-[#0E1020] border border-[#1C223A] flex items-center justify-center text-[#C9C9D4] hover:text-[#FF0000] hover:border-[#FF0000] transition-all"
+                aria-label="Canal Oficial YouTube da Graça Digital Music"
               >
                 <Youtube className="w-4 h-4" />
               </a>

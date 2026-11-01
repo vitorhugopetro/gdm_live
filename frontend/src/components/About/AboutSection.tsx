@@ -51,6 +51,29 @@ export default function AboutSection({ compact = false }: Props) {
                   </div>
                 ))}
               </div>
+
+              {/* Botão de Destaque Canal do YouTube */}
+              <div className="mt-8 p-4 rounded-xl bg-[#FF0000]/10 border border-[#FF0000]/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#FF0000] flex items-center justify-center text-white shadow-lg shadow-[#FF0000]/30 flex-shrink-0">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-bold">Canal Oficial no YouTube</h3>
+                    <p className="text-gdm-muted text-xs">Inscreva-se em @graçadigitalmusic e assista aos videoclipes e lançamentos.</p>
+                  </div>
+                </div>
+                <a
+                  href="https://www.youtube.com/@gra%C3%A7adigitalmusic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg bg-[#FF0000] hover:bg-[#CC0000] text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 flex-shrink-0"
+                >
+                  Inscrever-se no YouTube
+                </a>
+              </div>
             </>
           )}
 
