@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useRadioStore } from '@/store/radioStore';
 import { Spinner } from '@/components/Common/Spinner';
+import { LivePresenceRadar } from './LivePresenceRadar';
 import toast from 'react-hot-toast';
 
 interface SystemStatus {
@@ -110,6 +111,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Radar de Presença em Tempo Real (Firestore Telemetry) */}
+      <LivePresenceRadar />
+
       {/* Status cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gdm-card border border-gdm-border rounded-2xl p-4">

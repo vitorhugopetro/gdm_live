@@ -7,11 +7,14 @@ import { AudioPlayer } from '@/components/Player/AudioPlayer';
 import { useNowPlaying } from '@/hooks/useNowPlaying';
 import { useTVNavigation } from '@/hooks/useTVNavigation';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useListenerPresence } from '@/hooks/useListenerPresence';
 import { HelpModal } from '@/components/Common/HelpModal';
 
 export default function Layout() {
   // Poll for now-playing and banner data at root level
   useNowPlaying();
+  // Live listener presence telemetry
+  useListenerPresence();
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
