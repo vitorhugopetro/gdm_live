@@ -9,10 +9,10 @@ interface SEOProps {
   type?: string;
 }
 
-const DEFAULT_TITLE = 'GDM Live Radio — A rádio cristã que toca sua fé o tempo todo | Graça Digital';
+const DEFAULT_TITLE = 'GDM Live Radio | Música, Fé e Propósito';
 const DEFAULT_DESC =
-  'Ouça a GDM Live Radio ao vivo 24 horas por dia. Músicas cristãs e louvores autorais da Graça Digital (GDM), mensagens de esperança, fé, adoração e renovação espiritual.';
-const DEFAULT_IMAGE = 'https://gdmlr.web.app/images/hero-art-hyperrealistic.jpg';
+  'Ouça músicas cristãs autorais que inspiram a fé e renovam a esperança. Conheça a GDM Live Radio!';
+const DEFAULT_IMAGE = 'https://gdmlr.web.app/images/og-share-preview.jpg';
 const BASE_URL = 'https://gdmlr.web.app';
 
 export function SEO({

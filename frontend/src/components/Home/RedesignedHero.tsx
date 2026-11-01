@@ -1,14 +1,17 @@
-import { Play, Pause, Radio, Maximize2 } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Pause, Radio, Maximize2, Share2 } from 'lucide-react';
 import { useRadioStore } from '@/store/radioStore';
 import { useRadioStream } from '@/hooks/useRadioStream';
+import { ShareSongModal } from '@/components/Player/ShareSongModal';
 
 interface RedesignedHeroProps {
   onToggleImmersive?: () => void;
 }
 
 export function RedesignedHero({ onToggleImmersive }: RedesignedHeroProps) {
-  const { isPlayerPlaying, connectionState, togglePlay } = useRadioStore();
+  const { isPlayerPlaying, connectionState, togglePlay, nowPlaying } = useRadioStore();
   const { retry } = useRadioStream();
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const isLive = connectionState === 'playing';
   const isConnecting = connectionState === 'connecting' || connectionState === 'loading';
@@ -85,6 +88,17 @@ export function RedesignedHero({ onToggleImmersive }: RedesignedHeroProps) {
               <span className="hidden sm:inline">Stream Contínuo 24h</span>
             </div>
 
+            {/* Share Radio Button */}
+            <button
+              onClick={() => setIsShareOpen(true)}
+              aria-label="Compartilhar a rádio"
+              title="Compartilhar a rádio com amigos"
+              className="flex items-center gap-2 px-4 py-3 rounded-full bg-[#0E1020]/90 border border-[#1C223A] text-xs font-semibold text-[#FFC928] hover:text-white hover:border-[#FFC928]/50 hover:bg-[#FFC928]/10 transition-all cursor-pointer shadow-sm active:scale-95"
+            >
+              <Share2 className="w-4 h-4 text-[#FFC928]" />
+              <span>Compartilhar a rádio</span>
+            </button>
+
             {/* Immersive mode button */}
             {onToggleImmersive && (
               <button
@@ -99,6 +113,13 @@ export function RedesignedHero({ onToggleImmersive }: RedesignedHeroProps) {
             )}
           </div>
         </div>
+
+        {/* Modal de Compartilhamento Rico */}
+        <ShareSongModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          track={nowPlaying?.track}
+        />
 
         {/* Right Column: Hero Art */}
         <div className="lg:col-span-7 relative flex items-center justify-center">
