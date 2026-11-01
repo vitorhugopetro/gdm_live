@@ -2,6 +2,7 @@ import { DailyVerseCard } from '@/components/Spiritual/DailyVerseCard';
 import { PrayerWallSection } from '@/components/Community/PrayerWallSection';
 import { TestimoniesSection } from '@/components/Community/TestimoniesSection';
 import { LiveChatSection } from '@/components/Community/LiveChatSection';
+import { ContributionCard } from '@/components/Common/ContributionCard';
 import { SEO } from '@/components/Common/SEO';
 
 export default function CommunityPage() {
@@ -9,7 +10,7 @@ export default function CommunityPage() {
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
       <SEO
         title="Mural de Oração & Comunidade"
-        description="Deixe seu pedido de oração, celebre testemunhos de fé e participe da comunidade de ouvintes da GDM Live Radio."
+        description="Deixe seu pedido de oração, celebre testemunhos de fé, contribua com o ministério e participe da comunidade de ouvintes da GDM Live Radio."
       />
       {/* Page Header */}
       <div className="text-center space-y-2">
@@ -26,6 +27,9 @@ export default function CommunityPage() {
 
       {/* Daily Verse */}
       <DailyVerseCard />
+
+      {/* Contribuição / Apoio ao Ministério */}
+      <ContributionCard />
 
       {/* Grid: Live Chat + Prayer Wall */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -45,4 +49,3 @@ export default function CommunityPage() {
     </div>
   );
 }
-

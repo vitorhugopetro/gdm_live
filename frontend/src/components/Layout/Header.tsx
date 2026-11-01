@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   HelpCircle,
+  HeartHandshake,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { GdmBrandLogo } from '@/components/Common/GdmBrandLogo';
@@ -20,9 +21,10 @@ import { SongRequestModal } from '@/components/Community/SongRequestModal';
 interface HeaderProps {
   isTVMode?: boolean;
   onToggleTVMode?: () => void;
+  onToggleHelp?: () => void;
 }
 
-export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps) {
+export default function Header({ isTVMode = false, onToggleTVMode, onToggleHelp }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps
     { to: '/programacao', label: 'Programação', icon: Calendar, isAction: false },
     { to: '/sobre', label: 'Sobre a GDM', icon: Info, isAction: false },
     { to: '#pedidos', label: 'Pedidos', icon: Music, isAction: true },
-    { to: '/comunidade', label: 'Contato', icon: Mail, isAction: false },
+    { to: '/comunidade', label: 'Contato & Apoio', icon: Mail, isAction: false },
   ];
 
   return (
@@ -90,6 +92,22 @@ export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2">
+            {/* Botão Doar / Contribuir (PIX & WhatsApp) com destaque harmonioso */}
+            <a
+              href="#contribuir"
+              onClick={(e) => {
+                if (window.location.pathname === '/') {
+                  e.preventDefault();
+                  document.getElementById('contribution-heading')?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#FFC928]/15 hover:bg-[#FFC928] text-[#FFC928] hover:text-[#07070D] border border-[#FFC928]/40 hover:border-[#FFC928] text-xs font-bold tracking-wide transition-all duration-200 shadow-[0_0_12px_rgba(255,201,40,0.2)] hover:scale-105"
+              title="Apoiar e Contribuir com a Rádio (PIX)"
+            >
+              <HeartHandshake className="w-4 h-4" />
+              <span>Contribuir</span>
+            </a>
+
             {/* Botão "Ouvir no App" */}
             <a
               href="https://gdm-live-radio.web.app"
@@ -118,15 +136,15 @@ export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps
             </button>
 
             {/* Help button */}
-            <a
-              href="?help=1"
-              onClick={(e) => { e.preventDefault(); }}
+            <button
+              type="button"
+              onClick={onToggleHelp}
               className="hidden md:flex w-9 h-9 rounded-full bg-[#0E1020] border border-[#1C223A] items-center justify-center text-[#C9C9D4] hover:text-[#FFC928] hover:border-[#FFC928]/40 transition-colors"
               aria-label="Atalhos e ajuda"
               title="Ajuda (pressione ?)"
             >
               <HelpCircle className="w-4 h-4" />
-            </a>
+            </button>
 
             {/* Painel Administrativo */}
             <Link
@@ -196,6 +214,22 @@ export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps
             })}
 
             <div className="pt-3 border-t border-[#1C223A] flex flex-col gap-2">
+              {/* Botão de Contribuição Mobile */}
+              <a
+                href="#contribuir"
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  if (window.location.pathname === '/') {
+                    e.preventDefault();
+                    document.getElementById('contribution-heading')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-[#FFC928] text-black font-bold text-sm shadow-[0_0_16px_rgba(255,201,40,0.3)]"
+              >
+                <HeartHandshake className="w-4 h-4" />
+                <span>Contribuir com a Rádio (PIX)</span>
+              </a>
+
               <a
                 href="https://gdm-live-radio.web.app"
                 target="_blank"

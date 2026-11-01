@@ -43,7 +43,7 @@ export default function Layout() {
         Pular para o conteúdo
       </a>
 
-      <Header isTVMode={isTVMode} onToggleTVMode={toggleTVMode} />
+      <Header isTVMode={isTVMode} onToggleTVMode={toggleTVMode} onToggleHelp={toggleHelp} />
       <div data-broadcast-banner>
         <BroadcastBannerBar />
       </div>

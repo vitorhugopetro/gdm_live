@@ -1,4 +1,4 @@
-import { Heart, Activity, Youtube, Instagram, Facebook } from 'lucide-react';
+import { Heart, Activity, Youtube, Instagram, Facebook, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function RedesignedFooter() {
@@ -66,10 +66,18 @@ export function RedesignedFooter() {
             <Link to="/sobre" className="hover:text-white transition-colors">Sobre Nós</Link>
             <Link to="/programacao" className="hover:text-white transition-colors">Grade 402 Músicas</Link>
             <Link to="/comunidade" className="hover:text-white transition-colors">Mural de Oração</Link>
+            <a
+              href="https://wa.me/5524988212712?text=Ol%C3%A1!%20Ouvi%20a%20GDM%20Live%20Radio%20e%20quero%20contribuir.%20Deus%20te%20aben%C3%A7oe!"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all font-bold"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>Contribuir (PIX)</span>
+            </a>
           </div>
         </div>
       </div>
     </footer>
   );
 }
-

@@ -5,6 +5,7 @@ import { FeatureHighlightRow } from '@/components/Home/FeatureHighlightRow';
 import { LowerActionCards } from '@/components/Home/LowerActionCards';
 import { DailyVerseCard } from '@/components/Spiritual/DailyVerseCard';
 import RecentlyPlayed from '@/components/History/RecentlyPlayed';
+import { ContributionCard } from '@/components/Common/ContributionCard';
 import { SEO } from '@/components/Common/SEO';
 import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
@@ -38,7 +39,10 @@ export default function HomePage() {
       {/* 5. Palavra Diária */}
       <DailyVerseCard />
 
-      {/* 6. Tocadas Recentemente */}
+      {/* 6. Contribua com a GDM Live Radio */}
+      <ContributionCard />
+
+      {/* 7. Tocadas Recentemente */}
       <section aria-labelledby="recent-heading" className="space-y-4">
         <div className="flex items-center justify-between pb-2 border-b border-[#1C223A]">
           <div className="flex items-center gap-2">
