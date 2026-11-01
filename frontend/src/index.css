@@ -183,6 +183,122 @@ body {
   padding-bottom: calc(var(--player-height) + 1rem);
 }
 
+/* ============================================================
+   TV MODE — Safe Area Margins, Large Touch Targets, Focus Ring
+   ============================================================ */
+.tv-mode {
+  font-size: 120%;
+}
+
+.tv-mode *:focus {
+  outline: 4px solid #FFC928 !important;
+  outline-offset: 4px !important;
+}
+
+.tv-mode button,
+.tv-mode a,
+.tv-mode [role="button"] {
+  min-height: 56px;
+  min-width: 56px;
+}
+
+.tv-mode header,
+.tv-mode main,
+.tv-mode footer {
+  padding-left: max(5vw, 2rem);
+  padding-right: max(5vw, 2rem);
+}
+
+.tv-mode .max-w-7xl {
+  max-width: 100%;
+  padding-left: 5vw;
+  padding-right: 5vw;
+}
+
+/* ============================================================
+   IMMERSIVE MODE — Full-screen player, hide header/footer
+   ============================================================ */
+.immersive-mode header,
+.immersive-mode footer,
+.immersive-mode [data-broadcast-banner],
+.immersive-mode [data-audio-player] {
+  display: none !important;
+}
+
+.immersive-mode main {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES — Fluid typography & safe overflow
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent horizontal overflow on any viewport */
+body {
+  overflow-x: hidden;
+}
+
+/* Fluid typography scale */
+:root {
+  --font-size-base: clamp(0.875rem, 2vw, 1rem);
+}
+
+/* Touch targets (mobile) */
+@media (pointer: coarse) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ============================================================
+   SKIP TO CONTENT — Accessibility
+   ============================================================ */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 9999;
+  background: #7000FF;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+/* ============================================================
+   HELP MODAL ANIMATION
+   ============================================================ */
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-animate-in {
+  animation: modal-in 0.2s ease forwards;
+}
+
 /* Gradient border effect */
 .gradient-border {
   position: relative;

@@ -7,16 +7,22 @@ import {
   Music,
   Mail,
   Smartphone,
-  Moon,
+  Tv2,
   Shield,
   Menu,
   X,
+  HelpCircle,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { GdmBrandLogo } from '@/components/Common/GdmBrandLogo';
 import { SongRequestModal } from '@/components/Community/SongRequestModal';
 
-export default function Header() {
+interface HeaderProps {
+  isTVMode?: boolean;
+  onToggleTVMode?: () => void;
+}
+
+export default function Header({ isTVMode = false, onToggleTVMode }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
@@ -31,11 +37,11 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-[#07070D]/95 backdrop-blur-xl border-b border-[#1C223A] shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
           {/* Logo Oficial GDM Live Radio */}
           <Link
             to="/"
-            className="flex items-center group transition-transform duration-200 hover:scale-[1.02]"
+            className="flex items-center group transition-transform duration-200 hover:scale-[1.02] shrink-0"
             aria-label="GDM Live Radio — Início"
           >
             <GdmBrandLogo size="md" />
@@ -83,7 +89,7 @@ export default function Header() {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             {/* Botão "Ouvir no App" */}
             <a
               href="https://gdm-live-radio.web.app"
@@ -95,15 +101,32 @@ export default function Header() {
               <span>Ouvir no App</span>
             </a>
 
-            {/* Alternador / Modo Escuro (Decorativo / Preserva o tema obsidian) */}
+            {/* TV Mode toggle */}
             <button
               type="button"
-              title="Modo Noite Ativo"
-              className="w-9 h-9 rounded-full bg-[#0E1020] border border-[#1C223A] flex items-center justify-center text-[#C9C9D4] hover:text-[#FFC928] hover:border-[#FFC928]/40 transition-colors shadow-sm"
-              aria-label="Modo de exibição"
+              title={isTVMode ? 'Desativar Modo TV' : 'Ativar Modo TV'}
+              onClick={onToggleTVMode}
+              className={clsx(
+                'w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-200',
+                isTVMode
+                  ? 'bg-[#FFC928] border-[#FFC928] text-black'
+                  : 'bg-[#0E1020] border-[#1C223A] text-[#C9C9D4] hover:text-[#FFC928] hover:border-[#FFC928]/40'
+              )}
+              aria-label={isTVMode ? 'Desativar Modo TV' : 'Ativar Modo TV'}
             >
-              <Moon className="w-4 h-4" />
+              <Tv2 className="w-4 h-4" />
             </button>
+
+            {/* Help button */}
+            <a
+              href="?help=1"
+              onClick={(e) => { e.preventDefault(); }}
+              className="hidden md:flex w-9 h-9 rounded-full bg-[#0E1020] border border-[#1C223A] items-center justify-center text-[#C9C9D4] hover:text-[#FFC928] hover:border-[#FFC928]/40 transition-colors"
+              aria-label="Atalhos e ajuda"
+              title="Ajuda (pressione ?)"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </a>
 
             {/* Painel Administrativo */}
             <Link
@@ -183,6 +206,20 @@ export default function Header() {
                 <Smartphone className="w-4 h-4" />
                 <span>Ouvir no App</span>
               </a>
+
+              {/* TV Mode toggle in mobile menu */}
+              <button
+                onClick={() => { setMenuOpen(false); onToggleTVMode?.(); }}
+                className={clsx(
+                  'flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl text-xs border transition-all',
+                  isTVMode
+                    ? 'bg-[#FFC928]/20 border-[#FFC928] text-[#FFC928]'
+                    : 'text-[#7A839E] hover:text-white border-[#1C223A]'
+                )}
+              >
+                <Tv2 className="w-3.5 h-3.5" />
+                <span>{isTVMode ? 'Desativar Modo TV' : 'Ativar Modo TV'}</span>
+              </button>
 
               <Link
                 to="/admin"

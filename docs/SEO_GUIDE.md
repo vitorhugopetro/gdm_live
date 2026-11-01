@@ -90,3 +90,4 @@ O componente `SEO` atualiza dinamicamente no cliente:
 3. Valide automaticamente através do Firebase Hosting / Google Account.
 4. Envie o sitemap: `https://gdmlr.web.app/sitemap.xml`.
 5. Solicite indexação da página inicial via ferramenta de Inspeção de URL.
+

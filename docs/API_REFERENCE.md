@@ -70,3 +70,4 @@ Pesquisa e paginação de todo o acervo de 402 louvores da rádio.
 
 ### `GET /api/banner`
 Retorna o aviso ou mensagem pastoral em destaque para exibição na barra de avisos da rádio.
+

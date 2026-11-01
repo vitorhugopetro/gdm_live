@@ -72,6 +72,28 @@ export function useRadioStream() {
     audio.volume = playerMuted ? 0 : playerVolume;
   }, [playerVolume, playerMuted]);
 
+  // Network online/offline recovery
+  useEffect(() => {
+    const handleOnline = () => {
+      // If we were in error/offline state, retry playback automatically
+      if (connectionState === 'offline' || connectionState === 'error') {
+        const audio = getGlobalAudio();
+        if (audio && isPlayerPlaying) {
+          audio.play().then(() => setConnectionState('playing')).catch(() => {});
+        }
+      }
+    };
+    const handleOffline = () => {
+      setConnectionState('offline');
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [connectionState, isPlayerPlaying, setConnectionState]);
+
   // Play specific track index
   const playTrackIndex = useCallback(
     (index: number) => {

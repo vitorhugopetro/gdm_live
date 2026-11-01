@@ -16,3 +16,17 @@ ReactDOM.createRoot(root).render(
   </React.StrictMode>
 );
 
+// Register Service Worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(() => {
+        console.log('[GDM] Service Worker registrado com sucesso.');
+      })
+      .catch((err) => {
+        console.warn('[GDM] Service Worker não registrado:', err);
+      });
+  });
+}
+

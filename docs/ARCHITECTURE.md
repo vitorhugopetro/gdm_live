@@ -71,3 +71,4 @@ flowchart TD
 ### 2.3. Motor de Streaming Backend (`server/`)
 - **FFmpeg Pipeline:** Transcodifica faixas do catálogo local (`E:\GDM_LIVE_RADIO\Minhas_Musicas`) sob demanda em MP3 estéreo 128 kbps e 44.1 kHz, transmitindo via `chunked transfer encoding`.
 - **Cache de Inicialização:** Armazena metadados ID3 em `server/data/library-cache.json`, reduzindo o tempo de inicialização de 25 segundos para menos de 1 segundo para 402 arquivos.
+

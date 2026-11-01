@@ -9,7 +9,7 @@ export function LowerActionCards() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* CARD 1: Programação da Rádio */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E1020] to-[#07070D] border border-[#1C223A] hover:border-[#7000FF]/50 p-6 shadow-xl flex flex-col justify-between group transition-all duration-300">
           <div className="space-y-4">

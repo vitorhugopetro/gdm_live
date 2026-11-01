@@ -45,3 +45,4 @@ A rádio pode ser instalada diretamente na tela inicial do seu smartphone sem pr
 
 - **Pedidos de Música:** Na página inicial ou na barra superior, clique em **"Pedidos"** ou **"Faça Seu Pedido"** para escolher seu louvor favorito e enviar uma mensagem.
 - **Mural de Oração:** Acesse a aba **"Contato / Comunidade"** para registrar sua intenção de oração. Nossa equipe e outros ouvintes estarão intercedendo por você!
+

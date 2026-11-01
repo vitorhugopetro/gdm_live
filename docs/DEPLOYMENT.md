@@ -75,3 +75,4 @@ Para conectar um domínio próprio com certificado SSL grátis emitido pelo Goog
 3. Insira o domínio desejado.
 4. Adicione os registros `A` ou `CNAME` indicados na sua zona de DNS (ex: Registro.br ou Cloudflare).
 5. O Firebase provisionará o certificado SSL automaticamente em até 24 horas.
+
