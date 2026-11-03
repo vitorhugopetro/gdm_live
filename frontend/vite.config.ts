@@ -1,9 +1,28 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
+
+function copyPublicLight() {
+  return {
+    name: 'copy-public-light',
+    closeBundle() {
+      const publicDir = path.resolve(__dirname, 'public');
+      const distDir = path.resolve(__dirname, 'dist');
+      const items = ['images', 'manifest.json', 'favicon.svg', 'robots.txt', 'sitemap.xml', 'sw.js'];
+      for (const item of items) {
+        const src = path.join(publicDir, item);
+        const dst = path.join(distDir, item);
+        if (fs.existsSync(src)) {
+          fs.cpSync(src, dst, { recursive: true, force: true });
+        }
+      }
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), copyPublicLight()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -26,6 +45,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    emptyOutDir: false,
+    copyPublicDir: false,
     sourcemap: true,
     chunkSizeWarningLimit: 700,
     rollupOptions: {

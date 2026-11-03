@@ -1,17 +1,19 @@
 /**
  * release_perfect_hybrid.js
  * Combines all 402 previously-uploaded audio file hashes from version 2c0ae1bd759fda78
- * with the latest frontend build (HTML, JS, CSS, Open Graph preview image) from cd5ff7b020f59f61.
- * Deploys instantly to both gdmlr and gdm-live-radio via the Firebase Hosting API!
+ * with the latest frontend build (HTML, JS, CSS, images, Open Graph cards) from frontend/dist.
+ * Uploads any newly changed files to Firebase Hosting and deploys instantly to both gdmlr and gdm-live-radio!
  */
 
 const https = require('https');
 const crypto = require('crypto');
 const fs = require('fs');
-
 const path = require('path');
+const zlib = require('zlib');
+
 const sa = require(path.resolve(__dirname, '../gdm-live-radio-firebase-adminsdk-fbsvc-f253de6196.json'));
 const SITES = ['gdmlr', 'gdm-live-radio'];
+const DIST_DIR = path.resolve(__dirname, '../frontend/dist');
 
 function getToken() {
   return new Promise((resolve, reject) => {
@@ -79,6 +81,33 @@ function request(url, options = {}, data = null) {
   });
 }
 
+function uploadFile(uploadUrl, token, hash, gzippedBuffer) {
+  return new Promise((resolve, reject) => {
+    const fullUrl = `${uploadUrl}/${hash}`;
+    const req = https.request(fullUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': gzippedBuffer.length
+      }
+    }, res => {
+      let b = '';
+      res.on('data', c => b += c);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(b);
+        } else {
+          reject(new Error(`Upload failed for hash ${hash} with status ${res.statusCode}: ${b}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(gzippedBuffer);
+    req.end();
+  });
+}
+
 async function getVersionFiles(token, site, version) {
   const res = await request(`https://firebasehosting.googleapis.com/v1beta1/sites/${site}/versions/${version}/files?pageSize=1000`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -86,44 +115,98 @@ async function getVersionFiles(token, site, version) {
   return res.files || [];
 }
 
+function scanDistFiles(dir, baseDir = dir) {
+  const list = [];
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    // Ignore audio dir in local scan since we use the verified hosting audio hashes
+    if (entry.isDirectory()) {
+      if (entry.name !== 'audio') {
+        list.push(...scanDistFiles(fullPath, baseDir));
+      }
+    } else {
+      const relPath = '/' + path.relative(baseDir, fullPath).replace(/\\/g, '/');
+      const raw = fs.readFileSync(fullPath);
+      // Firebase Hosting requires gzipped uploads, and the hash in populateFiles must match the gzipped payload
+      const gzipped = zlib.gzipSync(raw, { level: 9 });
+      const hash = crypto.createHash('sha256').update(gzipped).digest('hex');
+      list.push({ path: relPath, hash, gzipped, fullPath });
+    }
+  }
+  return list;
+}
+
 async function deploySite(token, site) {
   console.log(`\n========================================`);
   console.log(`🚀 Preparando release completo para: ${site}`);
   console.log(`========================================`);
 
-  // 1. Get audio files from version 2c0ae1bd759fda78
+  // 1. Get 402 audio files from permanent version 2c0ae1bd759fda78
   const baseFiles = await getVersionFiles(token, 'gdmlr', '2c0ae1bd759fda78');
-  console.log(`✓ Recuperados ${baseFiles.length} arquivos base da versão de áudio`);
+  const audioFiles = baseFiles.filter(f => f.path.startsWith('/audio/'));
+  console.log(`✓ Recuperadas ${audioFiles.length} faixas de áudio da biblioteca hospedada`);
 
-  // 2. Get latest build files from version cd5ff7b020f59f61
-  const latestBuildFiles = await getVersionFiles(token, 'gdmlr', 'cd5ff7b020f59f61');
-  console.log(`✓ Recuperados ${latestBuildFiles.length} arquivos da compilação mais recente`);
+  // 2. Scan local dist files (HTML, JS, CSS, images, etc.)
+  const distFiles = scanDistFiles(DIST_DIR);
+  console.log(`✓ Escaneados ${distFiles.length} arquivos locais recém-compilados em frontend/dist`);
 
-  // 3. Build unified file map
+  // 3. Build unified file map and hash-to-buffer map
   const fileMap = {};
-  baseFiles.forEach(f => fileMap[f.path] = f.hash);
-  // Overwrite with latest HTML/JS/CSS/OG image
-  latestBuildFiles.forEach(f => fileMap[f.path] = f.hash);
+  const hashToBuffer = {};
+
+  // Audio files mapping
+  audioFiles.forEach(f => fileMap[f.path] = f.hash);
+
+  // Local dist files mapping (will overwrite any older web asset)
+  distFiles.forEach(f => {
+    fileMap[f.path] = f.hash;
+    hashToBuffer[f.hash] = f.gzipped;
+  });
 
   const totalFiles = Object.keys(fileMap).length;
   const audioCount = Object.keys(fileMap).filter(p => p.startsWith('/audio/')).length;
-  console.log(`✓ Mapa unificado: ${totalFiles} arquivos totais, sendo ${audioCount} faixas de áudio MP3`);
+  console.log(`✓ Mapa unificado: ${totalFiles} arquivos totais (${audioCount} áudios + ${distFiles.length} estáticos)`);
 
-  // 4. Create new version with hosting configuration
+  // 4. Create new version with hosting configuration including complete CORS & Cache headers
   const config = {
     headers: [
+      {
+        glob: '**',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+          'Access-Control-Allow-Headers': '*'
+        }
+      },
+      {
+        glob: '/index.html',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Access-Control-Allow-Origin': '*'
+        }
+      },
+      {
+        glob: '**/*.@(jpg|jpeg|png|webp|svg|ico)',
+        headers: {
+          'Cache-Control': 'public, max-age=86400',
+          'Access-Control-Allow-Origin': '*'
+        }
+      },
       {
         glob: '**/*.@(mp3)',
         headers: {
           'Content-Type': 'audio/mpeg',
           'Accept-Ranges': 'bytes',
-          'Cache-Control': 'public, max-age=86400'
+          'Cache-Control': 'public, max-age=86400',
+          'Access-Control-Allow-Origin': '*'
         }
       },
       {
         glob: '**/*.@(js|css|woff|woff2|ttf|eot)',
         headers: {
-          'Cache-Control': 'public, max-age=31536000, immutable'
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'Access-Control-Allow-Origin': '*'
         }
       }
     ],
@@ -148,7 +231,7 @@ async function deploySite(token, site) {
   console.log(`✓ Nova versão criada: ${versionName}`);
 
   // 5. Populate files using hash mapping
-  console.log(`2. Populando todos os ${totalFiles} arquivos via tabela de hashes (sem upload repetido)...`);
+  console.log(`2. Populando todos os ${totalFiles} arquivos via tabela de hashes...`);
   const populateRes = await request(`https://firebasehosting.googleapis.com/v1beta1/${versionName}:populateFiles`, {
     method: 'POST',
     headers: {
@@ -158,9 +241,21 @@ async function deploySite(token, site) {
   }, { files: fileMap });
 
   const uploadRequired = populateRes.uploadRequiredHashes || [];
+  const uploadUrl = populateRes.uploadUrl;
   console.log(`✓ Arquivos mapeados com sucesso! Hashes requeridos para upload: ${uploadRequired.length}`);
+
+  // Upload any new or modified file
   if (uploadRequired.length > 0) {
-    console.warn(`Atenção: ${uploadRequired.length} hashes não foram encontrados no armazenamento.`);
+    console.log(`Enviando ${uploadRequired.length} arquivo(s) novo(s)...`);
+    for (const h of uploadRequired) {
+      const buf = hashToBuffer[h];
+      if (buf) {
+        await uploadFile(uploadUrl, token, h, buf);
+        console.log(`  ✓ Upload concluído para hash ${h.slice(0, 12)}...`);
+      } else {
+        console.warn(`  ⚠️ Buffer não encontrado localmente para hash ${h}`);
+      }
+    }
   }
 
   // 6. Finalize version
@@ -189,7 +284,7 @@ async function deploySite(token, site) {
 }
 
 async function main() {
-  console.log('=== GDM LIVE RADIO — LANÇAMENTO DEFINITIVO 402 MÚSICAS ===');
+  console.log('=== GDM LIVE RADIO — DEPLOY HÍBRIDO AVANÇADO (CORS + OPEN GRAPH + 402 ÁUDIOS) ===');
   const token = await getToken();
   console.log('✓ Token OAuth obtido com sucesso!');
 
@@ -198,7 +293,7 @@ async function main() {
   }
 
   console.log('\n======================================================');
-  console.log('✅ PROCESSO CONCLUÍDO COM SUCESSO EM AMBOS OS SITES!');
+  console.log('✅ DEPLOY 100% CONCLUÍDO E ATIVO EM PRODUÇÃO!');
   console.log('🌐 https://gdmlr.web.app/');
   console.log('🌐 https://gdm-live-radio.web.app/');
   console.log('======================================================');
