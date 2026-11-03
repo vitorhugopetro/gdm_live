@@ -17,3 +17,4 @@ https.get('https://gdmlr.web.app', (res) => {
     console.log('Palavra contemporânea no HTML inicial:', hasContemp ? 'PRESENTE (ERRO)' : 'REMOVIDA (SUCESSO)');
   });
 }).on('error', e => console.error(e));
+
